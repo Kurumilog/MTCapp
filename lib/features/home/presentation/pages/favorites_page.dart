@@ -1,17 +1,17 @@
 /**
  * 1) Общее назначение:
- *    Экран «Коллекции» — отображает сгруппированные файлы или альбомы.
+ *    Экран «Избранное» — отображает файлы, отмеченные пользователем как важные.
  * 2) С какими файлами связан:
  *    - Встраивается в HomePage.
  * 3) Описание функций:
- *    - CollectionsPage: StatelessWidget, отображающий заглушку коллекций.
+ *    - FavoritesPage: StatelessWidget, отображающий заглушку с иконкой звезды.
  */
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/l10n/app_localizations.dart';
 
-class CollectionsPage extends StatelessWidget {
-  const CollectionsPage({super.key});
+class FavoritesPage extends StatelessWidget {
+  const FavoritesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,20 +26,20 @@ class CollectionsPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.folder_rounded,
+              Icons.star_rounded,
               size: iconSize.clamp(60.0, 120.0),
               color: AppColors.primaryRed.withValues(alpha: 0.3),
             ),
             SizedBox(height: size.height * 0.02),
             Text(
-              l10n.collectionsTitle,
+              l10n.favoritesTitle,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     color: Colors.black54,
                   ),
             ),
             SizedBox(height: size.height * 0.01),
             Text(
-              l10n.collectionsSubtitle,
+              l10n.favoritesSubtitle,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Colors.grey,
