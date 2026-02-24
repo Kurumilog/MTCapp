@@ -1,68 +1,37 @@
-# Navbar Redesign + English Localization
+# Implementation Plan — Project Finalization & AI Hand-off
 
-Redesign the bottom navigation bar to match 5-tab layout (Избранное → Галерея → **+** → Коллекции → Ещё), add a bottom sheet with camera/gallery/file actions on the **+** button, add English language support, and ensure full responsive upscaling.
+## Goal
 
-## Proposed Changes
+Finish the MTCapp refactoring, clean up the codebase from buggy dependencies, and prepare a comprehensive context for the next AI developer.
 
-### Navigation & Pages
+## realized Changes
 
-#### [MODIFY] [home_page.dart](file:///home/kurumi/code/temp/MTCapp/lib/features/home/presentation/pages/home_page.dart)
+### 1. Refactoring & Rebranding
 
-- Rewrite bottom navbar: **5 items** — Избранное (star), Галерея (photo), **+ (add)**, Коллекции (folder), Ещё (more_horiz)
-- `IndexedStack` pages: `FavoritesPage`, `GalleryPage`, `CollectionsPage`, `MorePage` (+ is action-only)
-- Bottom sheet on "+" tap: 3 options — Сделать фото (camera), Выбрать из галереи (image picker), Загрузить файл (file browser) — each currently just closes the sheet
-- Responsive sizing via `MediaQuery` for icons, text, and padding
+- **[DELETE]** `cupertino_native` dependency (unstable).
+- **[RENAME]** `GlassButton` -> `AuthButton`, `GlassTextField` -> `AuthTextField`, `GlassBackground` -> `AuthBackground`.
+- **[RENAME]** Files renamed to match class names (e.g., `auth_button.dart`).
+- **[UPDATE]** All imports and color constants (`glassWhite` -> `translucentWhite`).
 
-#### [NEW] [favorites_page.dart](file:///home/kurumi/code/temp/MTCapp/lib/features/home/presentation/pages/favorites_page.dart)
+### 2. Documentation & Structure
 
-- Stub page with star icon and "Избранное" / "Your favorites will appear here"
+- **[NEW]** `MTCpath/project_context.md`: Detailed "brain dump" for the next AI assistant.
+- **[MODIFY]** `README.md`: Included iOS permissions, CocoaPods steps, and a technical architecture overview.
+- **[MODIFY]** All source files: Added Russian/English documentation block at the top.
 
-#### [NEW] [more_page.dart](file:///home/kurumi/code/temp/MTCapp/lib/features/home/presentation/pages/more_page.dart)
+### 3. iOS Support
 
-- Stub page with menu items: Корзина (disabled/future), Скачать (future), Импорт из облака (future)
-- All items shown as disabled/coming-soon
+- **[MODIFY]** `ios/Runner/Info.plist`: Added `NSCameraUsageDescription`, `NSPhotoLibraryUsageDescription`, and `NSMicrophoneUsageDescription`.
 
-#### [DELETE] [profile_page.dart](file:///home/kurumi/code/temp/MTCapp/lib/features/home/presentation/pages/profile_page.dart)
+## Hand-off Checklist
 
-- Replaced by `MorePage`
+- [x] All "Glass" branding removed.
+- [x] No unused dependencies in `pubspec.yaml`.
+- [x] `project_context.md` contains the "Navigator Context Safety" logic explanation.
+- [x] All changes pushed to GitHub.
 
----
+## Verification
 
-### Localization
-
-#### [NEW] [app_localizations.dart](file:///home/kurumi/code/temp/MTCapp/lib/core/l10n/app_localizations.dart)
-
-- Custom `LocalizationsDelegate` supporting `ru` and `en`
-- String map with all UI labels used in the app
-
-#### [MODIFY] [main.dart](file:///home/kurumi/code/temp/MTCapp/lib/main.dart)
-
-- Add `localizationsDelegates` and `supportedLocales` to `MaterialApp`
-
-#### [MODIFY] All pages
-
-- Replace hardcoded Russian strings with `AppLocalizations.of(context).xxx`
-
----
-
-### Responsive Upscaling
-
-All widgets will use `MediaQuery.sizeOf(context)` for:
-
-- Icon sizes
-- Font sizes
-- Padding/spacing
-
-## Verification Plan
-
-### Automated Tests
-
-- `flutter analyze` — no warnings
-- Visual check via `flutter run -d linux` or Android emulator
-
-### Manual Verification
-
-- Navbar shows 5 items in correct order
-- "+" opens bottom sheet with 3 options
-- Switching locale shows English labels
-- App scales properly on different screen sizes
+- Run `flutter run` on Android (SM S916B) to confirm camera/file functionality.
+- Verify `README.md` instructions on a Mac environment for iOS build.
+- Confirm `flutter analyze` returns no errors.

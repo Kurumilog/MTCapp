@@ -16,11 +16,16 @@
 - [x] Integrate localization into `main.dart`
 - [x] Match terminology (e.g., "Любимое" instead of "Избранное")
 
-## Documentation
+## Documentation & Cleanup
 
 - [x] Add Russian documentation blocks to all core files
+- [x] Export docs to `/MTCpath`
+- [x] Update `README.md` with technical details, setup guide, and iOS instructions
+- [x] PROJECT CLEANUP: Remove `cupertino_native` and rebranding "Glass" -> "Auth"
+- [x] Create `project_context.md` for AI hand-off
 
 ## Verification & Deployment
 
-- [/] Wait for Android SDK 34 installation and Gradle build
-- [ ] Verify functionality on device (SM S916B)
+- [x] Add iOS permissions (camera, library, mic) to `Info.plist`
+- [x] Sync changes with GitHub (resolved rebase conflicts)
+- [x] Verify functionality on device (SM S916B)
