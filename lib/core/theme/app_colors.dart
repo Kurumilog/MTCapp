@@ -1,26 +1,22 @@
-/**
- * 1) Общее назначение:
- *    Хранит все цветовые константы, используемые в дизайне приложения (палитра MTC Cloud).
- * 2) С какими файлами связан:
- *    - Используется практически во всех UI компонентах (кнопки, поля, фоны).
- * 3) Описание функций:
- *    - Не содержит методов. Предоставляет статические константы цветов для единообразия дизайна.
- */
+/// 1) Общее назначение:
+///    Цветовые константы палитры MTC Cloud, согласованные с Material 3 ColorScheme.
+/// 2) С какими файлами связан:
+///    - Используется в app_theme.dart и точечно в UI-компонентах.
+/// 3) Описание:
+///    Только те константы, которых нет в ColorScheme (accent, surface-варианты).
+library;
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const Color primaryRed = Color(0xFFE31B2D); // A slightly softer red similar to the image
-  static const Color brightRed = Color(0xFFFF0000);
-  
-  static const Color textRed = Color(0xFFD6334B);
-  static const Color iconRed = Color(0xFFE25365);
-  
-  static const Color white = Colors.white;
-  static const Color backgroundLight = Color(0xFFFDE8EA);
-  
-  static const Color cardColor = Color(0xFFEFAFB7); // Color visible on the card
-  static const Color fieldColor = Color(0xFFF8E0E3);
-  
-  static const Color translucentWhite = Color(0xB3FFFFFF); // 70% opacity white
-  static const Color translucentBorder = Color(0x4DFFFFFF); // 30% opacity
+  // Основной бренд MTC
+  static const Color primaryRed = Color(0xFFE31B2D);
+
+  // Текст / иконки на светлом фоне
+  static const Color onSurface = Color(0xFF1C1B1F);
+
+  // Заливка полей ввода (M3 surfaceVariant)
+  static const Color surfaceVariant = Color(0xFFF5F5F5);
+
+  // Полупрозрачный белый (используется в auth-карточках)
+  static const Color translucentWhite = Color(0xB3FFFFFF);
 }

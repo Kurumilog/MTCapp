@@ -1,142 +1,127 @@
-/**
- * 1) Общее назначение:
- *    Приветственный экран приложения "MTC Cloud", который встречает пользователя при первом запуске.
- * 2) С какими файлами связан:
- *    - lib/core/theme/app_colors.dart (цвета)
- *    - lib/core/widgets/auth_background.dart (базовый фон страниц)
- *    - lib/features/auth/presentation/widgets/auth_button.dart (кнопки авторизации)
- *    - lib/features/auth/presentation/pages/registration_page.dart (навигация)
- *    - lib/features/auth/presentation/pages/login_page.dart (навигация)
- * 3) Описание функций:
- *    - build(): Отрисовывает интерфейс приветственного экрана. Показывает логотип,
- *      приветственный текст, две кнопки (Регистрация, Войти) и ссылки внизу.
- */
+/// 1) Общее назначение:
+///    Приветственный экран приложения "MTC Cloud" (стиль Material 3).
+/// 2) С какими файлами связан:
+///    - lib/features/auth/presentation/widgets/auth_button.dart
+///    - lib/features/auth/presentation/pages/registration_page.dart
+///    - lib/features/auth/presentation/pages/login_page.dart
+///    - lib/features/home/presentation/pages/home_page.dart
+/// 3) Описание функций:
+///    - build(): Логотип, приветственный текст, FilledButton + OutlinedButton, ссылки внизу.
+library;
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/auth_background.dart';
 import '../widgets/auth_button.dart';
 import 'registration_page.dart';
 import 'login_page.dart';
 import '../../../home/presentation/pages/home_page.dart';
 
 class WelcomePage extends StatelessWidget {
-  const WelcomePage({Key? key}) : super(key: key);
+  const WelcomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
-      body: AuthBackground(
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Spacer(flex: 1),
-                
-                // MTC Cloud Logo Large
-                Icon(Icons.cloud_rounded, color: AppColors.primaryRed, size: 100),
-                const SizedBox(height: 20),
-                
-                Text(
-                  'Добро пожаловать в\nMTC Cloud',
-                  style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                    fontSize: 32,
-                    color: AppColors.primaryRed,
-                  ),
-                  textAlign: TextAlign.center,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Spacer(flex: 1),
+
+              // Logo
+              Icon(
+                Icons.cloud_rounded,
+                color: colorScheme.primary,
+                size: 96,
+              ),
+              const SizedBox(height: 24),
+
+              Text(
+                'Добро пожаловать в\nMTC Cloud',
+                style: textTheme.displaySmall?.copyWith(
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.bold,
                 ),
-                
-                const SizedBox(height: 20),
-                
-                Text(
-                  'Здесь вы можете надежно хранить свои данные, синхронизировать устройства и получать доступ к файлам из любой точки мира.',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Colors.black87,
-                  ),
-                  textAlign: TextAlign.center,
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 16),
+
+              Text(
+                'Здесь вы можете надёжно хранить свои данные, синхронизировать устройства и получать доступ к файлам из любой точки мира.',
+                style: textTheme.bodyLarge?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                 ),
-                
-                const Spacer(flex: 2),
-                
-                // Buttons
-                AuthButton(
-                  text: 'Регистрация',
-                  onPressed: () {
-                    Navigator.push(
+                textAlign: TextAlign.center,
+              ),
+
+              const Spacer(flex: 2),
+
+              // Primary action
+              AuthButton(
+                text: 'Регистрация',
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const RegistrationPage()),
+                ),
+              ),
+
+              // Secondary action
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => const RegistrationPage(),
-                      ),
-                    );
-                  },
-                ),
-                
-                const SizedBox(height: 10),
-                
-                AuthButton(
-                  text: 'Войти',
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const LoginPage(),
-                      ),
-                    );
-                  },
-                ),
-                
-                const Spacer(flex: 1),
-                
-                // Temporary skip button (until registration works)
-                TextButton.icon(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const HomePage(),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.arrow_forward_rounded, size: 18),
-                  label: const Text('Пропустить'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.grey.shade500,
-                  ),
-                ),
-                
-                const SizedBox(height: 8),
-                
-                // Footer Links
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    GestureDetector(
-                      onTap: () {},
-                      child: Text(
-                        'Задать вопросы',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.grey,
-                          fontSize: 14,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
+                      MaterialPageRoute(builder: (_) => const LoginPage()),
                     ),
-                    GestureDetector(
-                      onTap: () {},
-                      child: Text(
-                        'Перейти на сайт',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.grey,
-                          fontSize: 14,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                  ],
+                    child: const Text('Войти'),
+                  ),
                 ),
-              ],
-            ),
+              ),
+
+              const Spacer(flex: 1),
+
+              // Temp skip
+              TextButton.icon(
+                onPressed: () => Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const HomePage()),
+                ),
+                icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+                label: const Text('Пропустить'),
+                style: TextButton.styleFrom(
+                  foregroundColor: colorScheme.onSurfaceVariant,
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                    onPressed: () {},
+                    style: TextButton.styleFrom(
+                      foregroundColor: colorScheme.onSurfaceVariant,
+                    ),
+                    child: const Text('Задать вопросы'),
+                  ),
+                  TextButton(
+                    onPressed: () {},
+                    style: TextButton.styleFrom(
+                      foregroundColor: colorScheme.onSurfaceVariant,
+                    ),
+                    child: const Text('Перейти на сайт'),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),

@@ -1,0 +1,82 @@
+Этот документ — подробный обзор проекта, разработанного в контексте хакатона "Space Hackathon with MTC" (организован Belarusian State University через StartUp Space_BSU в партнёрстве с MTS Беларусь). Дата: 24 февраля 2026 года. Проект — это MVP (минимально жизнеспособный продукт) отечественной облачной платформы IaaS (Infrastructure as a Service), ориентированной на B2B-клиентов MTS (компании, нуждающиеся в облаке для хранения файлов, создания VPS/VDS). Фокус на самообслуживании через веб/мобильный интерфейс, панель админа, верификацию файлов через хэши и сетевую изоляцию (VLAN/VXLAN/SDN).
+Текст предназначен для передачи другому АИ-агенту: он включает цель, ТЗ, архитектуру, методы реализации, технологии, вызовы и рекомендации. Всё основано на анализе скриншотов хакатона, документации MTS Cloud, Proxmox/OpenStack и лучших практиках 2026 года.
+1. Обзор хакатона и цели проекта
+
+Хакатон: 48-часовой интенсив 4–6 марта 2026. Участники — студенты (команды 3–5 человек). Тема: "Спроектировать и смоделировать проект облачной платформы IaaS для Cloud-провайдера, включая веб-интерфейс для клиентов и простую панель администратора". Нет строгого ТЗ на старте — выдаётся на лекции 1. Акцент на инновации (AI-оптимизация ресурсов, интеграция с 5G MTS), прототип (дизайн + код), презентацию. Призы: гаджеты, стажировки в MTS.
+Цели проекта:
+Симулировать MTS Cloud (их реальный IaaS-сервис: vCPU/RAM/диски по ценам 16/17/0.95 BYN, S3-хранилище, IP).
+Услуги: Хранение файлов (фото/видео/документы) в личном/корпоративном облаке, создание VPS/VDS (виртуальные серверы с CPU/RAM/диском/сетью).
+Фокус: Безопасность (RBAC, хэш-верификация файлов), масштабируемость (SDN для сетей), UX (liquid glass эффект в UI).
+MVP: Рабочий прототип с веб/мобильным клиентом, бэкендом и симуляцией DevOps.
+
+
+2. Техническое задание (ТЗ) проекта (реконструированное)
+
+Основные требования:
+Веб/мобильный интерфейс клиента: Регистрация/логин, дашборд (список файлов/VPS), конфигуратор ресурсов (vCPU/RAM/диск по ценам MTS), мониторинг (usage CPU/RAM/диск >80% — alerts), биллинг (pay-as-you-go), upload/download файлов с верификацией, создание VPS/VDS (выбор конфигурации + сеть).
+Панель админа: Обзор пользователей/ресурсов, управление аккаунтами, глобальный мониторинг, отчёты, SDN-настройки.
+Услуги: Личное/корпоративное облако (shared folders), VPS/VDS (VM с изоляцией сетей).
+Технические: Микросервисы (REST/gRPC), БД (Postgres), виртуализация (Proxmox/QEMU), networking (VLAN/VXLAN/SDN), оркестратор (OpenStack optional).
+Инновации: AI-оптимизация (рекомендации по ресурсам), 5G-edge интеграция (mock).
+Безопасность: RBAC, шифрование, DDoS-mock, хэш-верификация файлов.
+
+Ограничения: 48 часов — фокус на MVP (локальный запуск, симуляция), без реального деплойа.
+Критерии успеха: Техническая глубина (40%), инновации (30%), UX (20%), презентация (10%).
+
+3. Архитектура проекта (многослойная, с встраиванием VLAN/VXLAN/SDN и OpenStack)
+Архитектура — микросервисная, с разделением на клиент, бэкенд и DevOps. Используем Proxmox как основу виртуализации, SDN для сетей, OpenStack как optional оркестратор для IaaS-уровня. Файлы загружаются с integrity check (SHA-256). Для VPS/VDS: Proxmox создаёт VM, SDN настраивает изоляцию.
+
+Клиентский слой (Flutter + сайт на React/Vite с liquid glass UI):
+UI: Liquid glass эффект (пакеты liquid_glass_widgets/liquid_glass_renderer, glass_kit — blur/translucency/refraction, кроссплатформенный).
+Компоненты: Кнопки (getwidget/VelocityX), навбар (persistent_bottom_nav_bar_v2), карточки файлов, списки с previews.
+Логика: Auth (JWT), upload файлов (вычисление SHA-256, запрос signed URL, прямой PUT), создание VPS (конфигуратор: CPU/RAM/диск/сеть VLAN/VXLAN).
+Мобильное: Android/iOS (PWA для сайта), оповещения (Firebase Push).
+
+Бэкенд слой (NestJS + Postgres):
+API: REST/gRPC (Fastify/Swagger для docs).
+Модули: Auth (JWT + RBAC: client/admin/corporate), Files (upload-request/complete с hash check), VPS (create/delete с Proxmox API), Networks (SDN config).
+Хранение: Postgres для метаданных (files/vps/users, hashes).
+Интеграция: Proxmox API (proxmoxer lib) для VM/VPS, SDN для VLAN/VXLAN, OpenStack API (если встроен) для оркестрации.
+Биллинг: Расчёт по MTS ценам, хранение в Postgres.
+
+DevOps/Хранилище слой (Proxmox + SDN + PBS/Ceph):
+Proxmox VE: Гипервизор для VPS/VDS (QEMU/KVM для VM, LXC для контейнеров).
+SDN (встроенный в Proxmox): Для VLAN/VXLAN — динамические VNet (зоны: VLAN для локальной изоляции, VXLAN для overlay/multi-node).
+Бэкенд вызывает SDN API для создания сетей (e.g., VXLAN зона с peers: IP узлов).
+
+OpenStack: Optional оркестратор (встраивается как layer над Proxmox) — Nova для вычислений (VPS), Neutron для SDN (VLAN/VXLAN), Cinder для storage. В MVP — симуляция через Proxmox API.
+Хранилище: PBS для файлов/бэкапов (chunk SHA-256 + CRC32C верификация), Ceph RGW для S3-подобного доступа (presigned URLs).
+Верификация: Хранилище проверяет чанки, бэкенд — финальный хэш.
+
+
+4. Методы реализации ключевых фич (с примерами)
+
+Загрузка файлов с верификацией:
+Клиент: SHA-256 файла → POST upload-request → получает signed URL → прямой PUT в PBS/Ceph (headers: X-File-Hash).
+Хранилище: Авто-проверка чанков (PBS: CRC32C + SHA-256).
+Бэкенд: После complete — GET manifest/head-object → сравнивает хэш → сохраняет в Postgres / удаляет при ошибке.
+
+Создание VPS/VDS:
+Клиент: Конфигуратор (vCPU/RAM/диск/сеть) → POST /api/vps/create.
+Бэкенд: Проверяет квоты → Proxmox API: Создать VM → SDN API: Прикрепить VLAN/VXLAN VNet (изоляция).
+OpenStack: Если встроен — через Nova: compute.instance_create (с network_id от Neutron).
+
+Networking (VLAN/VXLAN/SDN):
+SDN зона: VLAN (тег 100–4095) для локальной сегментации, VXLAN (VNI 1–16M) для overlay (multi-node).
+Метод: Бэкенд → Proxmox SDN API: Создать VNet → Присвоить VM (bridge vmbr0 с VLAN-aware).
+
+Liquid glass UI: Flutter пакеты (liquid_glass_widgets/renderer) — кроссплатформенный blur/refraction для кнопок/карточек.
+
+5. Технологии и инструменты
+
+Клиент: Flutter (Dart), пакеты: getwidget (кнопки/карточки), persistent_bottom_nav_bar_v2 (навбар), liquid_glass_widgets (glass), dio (API), file_picker (upload).
+Бэкенд: NestJS (Node.js), Postgres, JWT/RBAC, proxmoxer (Proxmox API).
+DevOps: Proxmox VE/PBS, SDN (VLAN/VXLAN), OpenStack (Nova/Neutron optional), Ceph/MinIO (S3).
+Другое: SHA-256 (crypto lib), Swagger (docs), Docker/K8s (для деплойа).
+
+6. Вызовы и рекомендации
+
+Масштаб: SDN для multi-node, OpenStack для оркестрации.
+Безопасность: RBAC, шифрование в PBS.
+Хакатон: Симулируйте SDN/OpenStack через mock в NestJS.
+Расширение: AI для оптимизации VPS (e.g., предсказание нагрузки).

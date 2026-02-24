@@ -35,3 +35,45 @@ Finish the MTCapp refactoring, clean up the codebase from buggy dependencies, an
 - Run `flutter run` on Android (SM S916B) to confirm camera/file functionality.
 - Verify `README.md` instructions on a Mac environment for iOS build.
 - Confirm `flutter analyze` returns no errors.
+
+---
+
+## Phase 2 Plan — Backend Integration / Интеграция с бэкендом `[PENDING — ЖДУТ SWAGGER]`
+
+> ⛔ **НЕ НАЧИНАТЬ** до получения Swagger-документации бэкенда.
+> Ендпоинты, параметры запросов и схемы ответов будут уточнены по Swagger до начала разработки.
+>
+> Фаза 1 (рефакторинг UI) завершена. Ниже — план следующей фазы.
+
+### Контекст
+Flutter-приложение является **мобильным клиентом** платформы MTC Cloud IaaS. Бэкенд — NestJS + Postgres + Proxmox. Хранилище — PBS/Ceph с presigned S3 URLs и SHA-256 верификацией.
+
+### Задачи Phase 2
+
+**[ADD]** Зависимости:
+- `dio` — HTTP с JWT-interceptor.
+- `crypto` — SHA-256 для файлов.
+- `flutter_secure_storage` — хранение токена.
+
+**[NEW]** `lib/core/services/auth_service.dart` — JWT login/register/logout, сохранение токена.
+
+**[NEW]** `lib/core/services/file_service.dart` — Upload flow: SHA-256 → signed URL → PUT → complete.
+
+**[NEW]** `lib/core/services/vps_service.dart` — Запросы к `/api/vps`.
+
+**[UPDATE]** `lib/features/auth/` — Подключить `AuthService` вместо mock-логина.
+
+**[UPDATE]** `lib/features/home/` — Галерея/Коллекции подключить к `FileService`.
+
+**[NEW]** `lib/features/home/presentation/pages/vps_page.dart` — VPS Manager.
+
+**[NEW]** `lib/features/home/presentation/pages/billing_page.dart` — Биллинг.
+
+### Критический порядок загрузки файлов
+```
+1. SHA-256(file) локально
+2. POST /api/files/upload-request → signed URL
+3. PUT signedUrl (с заголовком X-File-Hash)
+4. POST /api/files/complete → верификация на сервере
+```
+Нарушение порядка = файл не сохранится.

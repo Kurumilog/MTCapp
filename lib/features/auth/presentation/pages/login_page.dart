@@ -1,148 +1,110 @@
-/**
- * 1) Общее назначение:
- *    Экран входа (Login) для существующих пользователей.
- * 2) С какими файлами связан:
- *    - lib/core/theme/app_colors.dart (цвета)
- *    - lib/core/widgets/auth_background.dart (базовый фон страниц)
- *    - lib/features/auth/presentation/widgets/auth_text_field.dart (текстовое поле Email)
- *    - lib/features/auth/presentation/widgets/auth_button.dart (кнопки авторизации)
- * 3) Описание функций:
- *    - build(): Отрисовывает интерфейс входа. Содержит логотип, карточку входа
- *      с полем электронной почты и кнопкой "Войти". Снизу ссылка на регистрацию.
- */
-import 'dart:ui';
+/// 1) Общее назначение:
+///    Экран входа (Login) для существующих пользователей (Material 3).
+/// 2) С какими файлами связан:
+///    - lib/features/auth/presentation/widgets/auth_text_field.dart
+///    - lib/features/auth/presentation/widgets/auth_button.dart
+/// 3) Описание функций:
+///    - build(): Логотип, M3 Card с полем email, кнопка входа.
+library;
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/auth_background.dart';
 import '../widgets/auth_text_field.dart';
 import '../widgets/auth_button.dart';
+import 'registration_page.dart';
 
 class LoginPage extends StatelessWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
-      body: AuthBackground(
-        isReversed: true, // Красное пятно слева
+      body: SafeArea(
         child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(height: 20),
-                
-                // MTC Cloud Logo
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.cloud_rounded, color: AppColors.primaryRed, size: 40),
-                    const SizedBox(width: 10),
-                    Text(
-                      'MTC Cloud',
-                      style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                        fontSize: 32,
-                        color: AppColors.primaryRed,
-                      ),
-                    ),
-                  ],
-                ),
-                
-                const SizedBox(height: 40),
-                
-                // Main Auth Card
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(42),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF545454).withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(42),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
-                      ),
-                      child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20.0,
-                      vertical: 30.0,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Title Pill
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 20),
-                          decoration: BoxDecoration(
-                            color: AppColors.translucentWhite,
-                            borderRadius: BorderRadius.circular(40),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            'Добро пожаловать',
-                            style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                              fontSize: 24,
-                              color: AppColors.primaryRed,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        
-                        const SizedBox(height: 20),
-                        
-                        // User requested login via email only
-                        const AuthTextField(
-                          hintText: 'Электронная почта',
-                          icon: Icons.email_rounded,
-                        ),
-                        
-                        const SizedBox(height: 20),
-                        
-                        AuthButton(
-                          text: 'Войти',
-                          onPressed: () {},
-                        ),
-                      ],
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 20),
+
+              // Logo
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.cloud_rounded, color: colorScheme.primary, size: 36),
+                  const SizedBox(width: 10),
+                  Text(
+                    'MTC Cloud',
+                    style: textTheme.headlineMedium?.copyWith(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                    ),
+                ],
+              ),
+
+              const SizedBox(height: 40),
+
+              // Auth Card
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20.0,
+                    vertical: 28.0,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        'Добро пожаловать',
+                        style: textTheme.headlineSmall?.copyWith(
+                          color: colorScheme.primary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      const AuthTextField(
+                        hintText: 'Электронная почта',
+                        icon: Icons.email_outlined,
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      const SizedBox(height: 8),
+                      AuthButton(
+                        text: 'Войти',
+                        onPressed: () {},
+                      ),
+                    ],
                   ),
                 ),
-                
-                const SizedBox(height: 40),
-                
-                // Registration prompt
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Еще нет аккаунта? ',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Colors.grey,
-                        fontSize: 16,
+              ),
+
+              const SizedBox(height: 32),
+
+              // Registration prompt
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Еще нет аккаунта? ',
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const RegistrationPage(),
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text(
-                        'Зарегистрироваться',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.grey.shade600,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-              ],
-            ),
+                    style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                    child: const Text('Зарегистрироваться'),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),

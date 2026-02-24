@@ -1,60 +1,40 @@
-/**
- * 1) Общее назначение:
- *    Переиспользуемое поле ввода текста с полупрозрачным фоном и иконкой.
- * 2) С какими файлами связан:
- *    - lib/core/theme/app_colors.dart (цвета)
- *    - Используется на RegistrationPage и LoginPage.
- * 3) Описание функций:
- *    - build(): Отрисовывает TextField внутри стилизованного контейнера-таблетки.
- *      Отображает hintText (подсказку) и иконку (icon) справа.
- */
-import 'dart:ui';
+/// 1) Общее назначение:
+///    Переиспользуемое поле ввода на основе Material 3 TextField.
+///    Стиль берётся из inputDecorationTheme (app_theme.dart).
+/// 2) С какими файлами связан:
+///    - Используется на LoginPage и RegistrationPage.
+/// 3) Описание функций:
+///    - build(): TextField с prefixIcon и hintText, стилизованный по M3.
+library;
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
 
 class AuthTextField extends StatelessWidget {
   final String hintText;
   final IconData icon;
   final TextCapitalization textCapitalization;
+  final TextInputType? keyboardType;
+  final bool obscureText;
 
   const AuthTextField({
-    Key? key,
+    super.key,
     required this.hintText,
     required this.icon,
     this.textCapitalization = TextCapitalization.none,
-  }) : super(key: key);
+    this.keyboardType,
+    this.obscureText = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(35),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-          child: Container(
-            height: 70,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: AppColors.translucentWhite.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(35),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
-            ),
-            child: TextField(
-              textCapitalization: textCapitalization,
-              style: const TextStyle(color: AppColors.textRed, fontSize: 18),
-              decoration: InputDecoration(
-                hintText: hintText,
-                hintStyle: const TextStyle(color: AppColors.cardColor, fontSize: 18),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.only(left: 30, top: 22, bottom: 22),
-                suffixIcon: Padding(
-                  padding: const EdgeInsets.only(right: 20.0),
-                  child: Icon(icon, color: AppColors.iconRed, size: 36),
-                ),
-              ),
-            ),
-          ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: TextField(
+        textCapitalization: textCapitalization,
+        keyboardType: keyboardType,
+        obscureText: obscureText,
+        decoration: InputDecoration(
+          hintText: hintText,
+          prefixIcon: Icon(icon),
         ),
       ),
     );

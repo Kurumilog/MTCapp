@@ -1,155 +1,120 @@
-/**
- * 1) Общее назначение:
- *    Главный экран регистрации нового пользователя в приложении "MTC Cloud".
- * 2) С какими файлами связан:
- *    - lib/core/theme/app_colors.dart (цвета)
- *    - lib/core/widgets/auth_background.dart (базовый фон страниц)
- *    - lib/features/auth/presentation/widgets/auth_text_field.dart (текстовые поля)
- *    - lib/features/auth/presentation/widgets/auth_button.dart (кнопка авторизации)
- * 3) Описание функций:
- *    - build(): Отрисовывает интерфейс экрана. Собирает вместе логотип, форму(с полями 
- *      ФИО, Телефон, Email, и кнопкой "Зарегистрироваться") и ссылку на вход.
- */
-import 'dart:ui';
+/// 1) Общее назначение:
+///    Экран регистрации нового пользователя (Material 3).
+/// 2) С какими файлами связан:
+///    - lib/features/auth/presentation/widgets/auth_text_field.dart
+///    - lib/features/auth/presentation/widgets/auth_button.dart
+/// 3) Описание функций:
+///    - build(): Логотип, M3 Card с полями (ФИО, Телефон, Email) и кнопкой.
+library;
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/auth_background.dart';
 import '../widgets/auth_text_field.dart';
 import '../widgets/auth_button.dart';
+import 'login_page.dart';
 
 class RegistrationPage extends StatelessWidget {
-  const RegistrationPage({Key? key}) : super(key: key);
+  const RegistrationPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
-      body: AuthBackground(
+      body: SafeArea(
         child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(height: 20),
-                
-                // MTC Cloud Logo
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.cloud_rounded, color: AppColors.primaryRed, size: 40),
-                    const SizedBox(width: 10),
-                    Text(
-                      'MTC Cloud',
-                      style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                        fontSize: 32,
-                        color: AppColors.primaryRed,
-                      ),
-                    ),
-                  ],
-                ),
-                
-                const SizedBox(height: 40),
-                
-                // Main Auth Card
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(42),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF545454).withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(42),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
-                      ),
-                      child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20.0,
-                      vertical: 30.0,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Title Pill
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 20),
-                          decoration: BoxDecoration(
-                            color: AppColors.translucentWhite,
-                            borderRadius: BorderRadius.circular(40),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            'Зарегистрируйтесь',
-                            style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                              fontSize: 24,
-                              color: AppColors.primaryRed,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        
-                        const SizedBox(height: 20),
-                        
-                        const AuthTextField(
-                          hintText: 'ФИО',
-                          icon: Icons.person_rounded,
-                          textCapitalization: TextCapitalization.words,
-                        ),
-                        const AuthTextField(
-                          hintText: 'Номер телефона',
-                          icon: Icons.phone_rounded,
-                        ),
-                        const AuthTextField(
-                          hintText: 'Электронная почта',
-                          icon: Icons.email_rounded,
-                        ),
-                        
-                        const SizedBox(height: 20),
-                        
-                        AuthButton(
-                          text: 'Зарегистрироваться',
-                          onPressed: () {},
-                        ),
-                      ],
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 20),
+
+              // Logo
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.cloud_rounded, color: colorScheme.primary, size: 36),
+                  const SizedBox(width: 10),
+                  Text(
+                    'MTC Cloud',
+                    style: textTheme.headlineMedium?.copyWith(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                    ),
+                ],
+              ),
+
+              const SizedBox(height: 40),
+
+              // Auth Card
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20.0,
+                    vertical: 28.0,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        'Зарегистрируйтесь',
+                        style: textTheme.headlineSmall?.copyWith(
+                          color: colorScheme.primary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      const AuthTextField(
+                        hintText: 'ФИО',
+                        icon: Icons.person_outline_rounded,
+                        textCapitalization: TextCapitalization.words,
+                      ),
+                      const AuthTextField(
+                        hintText: 'Номер телефона',
+                        icon: Icons.phone_outlined,
+                        keyboardType: TextInputType.phone,
+                      ),
+                      const AuthTextField(
+                        hintText: 'Электронная почта',
+                        icon: Icons.email_outlined,
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      const SizedBox(height: 8),
+                      AuthButton(
+                        text: 'Зарегистрироваться',
+                        onPressed: () {},
+                      ),
+                    ],
                   ),
                 ),
-                
-                const SizedBox(height: 40),
-                
-                // Login prompt
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Уже зарегистрированы? ',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Colors.grey, // Изменено на серый
-                        fontSize: 16, // Уменьшен шрифт
+              ),
+
+              const SizedBox(height: 32),
+
+              // Login prompt
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Уже зарегистрированы? ',
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const LoginPage(),
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/login'); // just placeholder since we don't have routing exactly set yet, wait actually we can just use pop or push.
-                      },
-                      child: Text(
-                        'Войти',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.grey.shade600, // Серый темнее для ссылки
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-              ],
-            ),
+                    style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                    child: const Text('Войти'),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),

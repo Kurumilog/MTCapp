@@ -1,13 +1,9 @@
-/**
- * 1) Общее назначение:
- *    Экран «Галерея» — отображает медиа-файлы пользователя (фото, видео).
- * 2) С какими файлами связан:
- *    - Встраивается в HomePage.
- * 3) Описание функций:
- *    - GalleryPage: StatelessWidget, отображающий заглушку галереи.
- */
+/// 1) Общее назначение:
+///    Экран «Галерея» — медиа-файлы пользователя (Material 3, stub).
+/// 2) С какими файлами связан:
+///    - Встраивается в HomePage.
+library;
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/l10n/app_localizations.dart';
 
 class GalleryPage extends StatelessWidget {
@@ -16,8 +12,9 @@ class GalleryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final size = MediaQuery.sizeOf(context);
-    final iconSize = size.width * 0.2;
 
     return Center(
       child: Padding(
@@ -27,23 +24,21 @@ class GalleryPage extends StatelessWidget {
           children: [
             Icon(
               Icons.photo_library_rounded,
-              size: iconSize.clamp(60.0, 120.0),
-              color: AppColors.primaryRed.withValues(alpha: 0.3),
+              size: (size.width * 0.2).clamp(60.0, 120.0),
+              color: colorScheme.primary.withValues(alpha: 0.3),
             ),
             SizedBox(height: size.height * 0.02),
             Text(
               l10n.galleryTitle,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: Colors.black54,
-                  ),
+              style: textTheme.headlineMedium,
             ),
             SizedBox(height: size.height * 0.01),
             Text(
               l10n.gallerySubtitle,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey,
-                  ),
+              style: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),

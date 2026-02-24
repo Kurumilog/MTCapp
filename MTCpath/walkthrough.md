@@ -1,5 +1,20 @@
 # Final Walkthrough — Project Status & Hand-off
 
+## Project Scope / Место приложения в большом проекте
+
+> MTCapp — **мобильный клиент** в составе платформы MTC Cloud IaaS (хакатон Space Hackathon with MTC, BSU + MTS Беларусь, 4–6 марта 2026).
+
+Полная платформа включает:
+- **Flutter App** (этот репо) — мобильный клиент (Android/iOS).
+- **NestJS Backend** — REST API, JWT+RBAC, интеграция с Proxmox и хранилищем.
+- **Proxmox VE + SDN** — виртуализация VPS/VDS, изоляция сетей (VLAN/VXLAN).
+- **PBS / Ceph RGW** — файловое хранилище с SHA-256 верификацией, presigned S3 URLs.
+- **Postgres** — метаданные файлов, VPS, пользователей, биллинг.
+
+Фаза 1 (UI-рефакторинг) — **завершена**. Следующий шаг — подключение к реальному бэкенду (Phase 2, см. `task.md`).
+
+---
+
 ## Major Changes Summary / Основные изменения
 
 ### 1. Navigation & UI Redesign
