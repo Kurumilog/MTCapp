@@ -1,21 +1,21 @@
 /**
  * 1) Общее назначение:
- *    Виджет-обертка, создающий мягкий фон с размытыми красными фигурами.
+ *    Виджет-обертка, создающий чистый белый фон для страниц авторизации.
  * 2) С какими файлами связан:
  *    - lib/core/theme/app_colors.dart (цвета)
  *    - Используется как корневой фон на RegistrationPage, LoginPage, WelcomePage.
  * 3) Описание функций:
- *    - build(): Отрисовывает Stack с белым фоном и двумя полупрозрачными красными кругами.
- *      Если isReversed = true, перемещает основной красный круг в левый нижний угол (для LoginPage).
+ *    - build(): Отрисовывает SafeArea с контентом на белом фоне. 
+ *      (Декоративные элементы временно отключены для минималистичного дизайна).
  */
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
-class GlassBackground extends StatelessWidget {
+class AuthBackground extends StatelessWidget {
   final Widget child;
   final bool isReversed;
 
-  const GlassBackground({
+  const AuthBackground({
     Key? key,
     required this.child,
     this.isReversed = false,

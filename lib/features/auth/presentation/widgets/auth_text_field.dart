@@ -1,23 +1,23 @@
 /**
  * 1) Общее назначение:
- *    Переиспользуемое поле ввода текста с эффектом стекла и иконкой.
+ *    Переиспользуемое поле ввода текста с полупрозрачным фоном и иконкой.
  * 2) С какими файлами связан:
  *    - lib/core/theme/app_colors.dart (цвета)
  *    - Используется на RegistrationPage и LoginPage.
  * 3) Описание функций:
- *    - build(): Отрисовывает TextField без стандартных границ внутри контейнера-таблетки.
+ *    - build(): Отрисовывает TextField внутри стилизованного контейнера-таблетки.
  *      Отображает hintText (подсказку) и иконку (icon) справа.
  */
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 
-class GlassTextField extends StatelessWidget {
+class AuthTextField extends StatelessWidget {
   final String hintText;
   final IconData icon;
   final TextCapitalization textCapitalization;
 
-  const GlassTextField({
+  const AuthTextField({
     Key? key,
     required this.hintText,
     required this.icon,
@@ -36,7 +36,7 @@ class GlassTextField extends StatelessWidget {
             height: 70,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: AppColors.glassWhite.withValues(alpha: 0.2),
+              color: AppColors.translucentWhite.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(35),
               border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
             ),

@@ -3,9 +3,9 @@
  *    Экран входа (Login) для существующих пользователей.
  * 2) С какими файлами связан:
  *    - lib/core/theme/app_colors.dart (цвета)
- *    - lib/core/widgets/glass_background.dart (задний фон с эффектом стекла, isReversed=true)
- *    - lib/features/auth/presentation/widgets/glass_text_field.dart (текстовое поле Email)
- *    - lib/features/auth/presentation/widgets/glass_button.dart (кнопки)
+ *    - lib/core/widgets/auth_background.dart (базовый фон страниц)
+ *    - lib/features/auth/presentation/widgets/auth_text_field.dart (текстовое поле Email)
+ *    - lib/features/auth/presentation/widgets/auth_button.dart (кнопки авторизации)
  * 3) Описание функций:
  *    - build(): Отрисовывает интерфейс входа. Содержит логотип, карточку входа
  *      с полем электронной почты и кнопкой "Войти". Снизу ссылка на регистрацию.
@@ -13,9 +13,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/glass_background.dart';
-import '../widgets/glass_text_field.dart';
-import '../widgets/glass_button.dart';
+import '../../../../core/widgets/auth_background.dart';
+import '../widgets/auth_text_field.dart';
+import '../widgets/auth_button.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -23,7 +23,7 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GlassBackground(
+      body: AuthBackground(
         isReversed: true, // Красное пятно слева
         child: SingleChildScrollView(
           child: Padding(
@@ -51,7 +51,7 @@ class LoginPage extends StatelessWidget {
                 
                 const SizedBox(height: 40),
                 
-                // Main Glass Card
+                // Main Auth Card
                 ClipRRect(
                   borderRadius: BorderRadius.circular(42),
                   child: BackdropFilter(
@@ -76,7 +76,7 @@ class LoginPage extends StatelessWidget {
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(vertical: 20),
                           decoration: BoxDecoration(
-                            color: AppColors.glassWhite,
+                            color: AppColors.translucentWhite,
                             borderRadius: BorderRadius.circular(40),
                           ),
                           alignment: Alignment.center,
@@ -93,14 +93,14 @@ class LoginPage extends StatelessWidget {
                         const SizedBox(height: 20),
                         
                         // User requested login via email only
-                        const GlassTextField(
+                        const AuthTextField(
                           hintText: 'Электронная почта',
                           icon: Icons.email_rounded,
                         ),
                         
                         const SizedBox(height: 20),
                         
-                        GlassButton(
+                        AuthButton(
                           text: 'Войти',
                           onPressed: () {},
                         ),

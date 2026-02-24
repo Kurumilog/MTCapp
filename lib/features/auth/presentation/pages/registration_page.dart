@@ -3,9 +3,9 @@
  *    Главный экран регистрации нового пользователя в приложении "MTC Cloud".
  * 2) С какими файлами связан:
  *    - lib/core/theme/app_colors.dart (цвета)
- *    - lib/core/widgets/glass_background.dart (задний фон с эффектом стекла)
- *    - lib/features/auth/presentation/widgets/glass_text_field.dart (текстовые поля)
- *    - lib/features/auth/presentation/widgets/glass_button.dart (кнопка)
+ *    - lib/core/widgets/auth_background.dart (базовый фон страниц)
+ *    - lib/features/auth/presentation/widgets/auth_text_field.dart (текстовые поля)
+ *    - lib/features/auth/presentation/widgets/auth_button.dart (кнопка авторизации)
  * 3) Описание функций:
  *    - build(): Отрисовывает интерфейс экрана. Собирает вместе логотип, форму(с полями 
  *      ФИО, Телефон, Email, и кнопкой "Зарегистрироваться") и ссылку на вход.
@@ -13,9 +13,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/glass_background.dart';
-import '../widgets/glass_text_field.dart';
-import '../widgets/glass_button.dart';
+import '../../../../core/widgets/auth_background.dart';
+import '../widgets/auth_text_field.dart';
+import '../widgets/auth_button.dart';
 
 class RegistrationPage extends StatelessWidget {
   const RegistrationPage({Key? key}) : super(key: key);
@@ -23,7 +23,7 @@ class RegistrationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GlassBackground(
+      body: AuthBackground(
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
@@ -50,7 +50,7 @@ class RegistrationPage extends StatelessWidget {
                 
                 const SizedBox(height: 40),
                 
-                // Main Glass Card
+                // Main Auth Card
                 ClipRRect(
                   borderRadius: BorderRadius.circular(42),
                   child: BackdropFilter(
@@ -75,7 +75,7 @@ class RegistrationPage extends StatelessWidget {
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(vertical: 20),
                           decoration: BoxDecoration(
-                            color: AppColors.glassWhite,
+                            color: AppColors.translucentWhite,
                             borderRadius: BorderRadius.circular(40),
                           ),
                           alignment: Alignment.center,
@@ -91,23 +91,23 @@ class RegistrationPage extends StatelessWidget {
                         
                         const SizedBox(height: 20),
                         
-                        const GlassTextField(
+                        const AuthTextField(
                           hintText: 'ФИО',
                           icon: Icons.person_rounded,
                           textCapitalization: TextCapitalization.words,
                         ),
-                        const GlassTextField(
+                        const AuthTextField(
                           hintText: 'Номер телефона',
                           icon: Icons.phone_rounded,
                         ),
-                        const GlassTextField(
+                        const AuthTextField(
                           hintText: 'Электронная почта',
                           icon: Icons.email_rounded,
                         ),
                         
                         const SizedBox(height: 20),
                         
-                        GlassButton(
+                        AuthButton(
                           text: 'Зарегистрироваться',
                           onPressed: () {},
                         ),

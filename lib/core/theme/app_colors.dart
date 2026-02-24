@@ -21,6 +21,6 @@ class AppColors {
   static const Color cardColor = Color(0xFFEFAFB7); // Color visible on the card
   static const Color fieldColor = Color(0xFFF8E0E3);
   
-  static const Color glassWhite = Color(0xB3FFFFFF); // 70% opacity white
-  static const Color glassBorder = Color(0x4DFFFFFF); // 30% opacity
+  static const Color translucentWhite = Color(0xB3FFFFFF); // 70% opacity white
+  static const Color translucentBorder = Color(0x4DFFFFFF); // 30% opacity
 }

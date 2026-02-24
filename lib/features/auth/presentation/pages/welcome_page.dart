@@ -3,8 +3,8 @@
  *    Приветственный экран приложения "MTC Cloud", который встречает пользователя при первом запуске.
  * 2) С какими файлами связан:
  *    - lib/core/theme/app_colors.dart (цвета)
- *    - lib/core/widgets/glass_background.dart (задний фон с эффектом стекла)
- *    - lib/features/auth/presentation/widgets/glass_button.dart (кнопки)
+ *    - lib/core/widgets/auth_background.dart (базовый фон страниц)
+ *    - lib/features/auth/presentation/widgets/auth_button.dart (кнопки авторизации)
  *    - lib/features/auth/presentation/pages/registration_page.dart (навигация)
  *    - lib/features/auth/presentation/pages/login_page.dart (навигация)
  * 3) Описание функций:
@@ -13,8 +13,8 @@
  */
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/glass_background.dart';
-import '../widgets/glass_button.dart';
+import '../../../../core/widgets/auth_background.dart';
+import '../widgets/auth_button.dart';
 import 'registration_page.dart';
 import 'login_page.dart';
 import '../../../home/presentation/pages/home_page.dart';
@@ -25,7 +25,7 @@ class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GlassBackground(
+      body: AuthBackground(
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
@@ -60,7 +60,7 @@ class WelcomePage extends StatelessWidget {
                 const Spacer(flex: 2),
                 
                 // Buttons
-                GlassButton(
+                AuthButton(
                   text: 'Регистрация',
                   onPressed: () {
                     Navigator.push(
@@ -74,7 +74,7 @@ class WelcomePage extends StatelessWidget {
                 
                 const SizedBox(height: 10),
                 
-                GlassButton(
+                AuthButton(
                   text: 'Войти',
                   onPressed: () {
                     Navigator.push(
