@@ -18,7 +18,11 @@ import 'registration_page.dart';
 import '../../../home/presentation/pages/home_page.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
-  const LoginPage({super.key});
+  /// Если true — после успешного входа делаем pop (вызов из MorePage).
+  /// Если false — pushReplacement на HomePage (вызов из WelcomePage).
+  final bool popOnSuccess;
+
+  const LoginPage({super.key, this.popOnSuccess = false});
 
   @override
   ConsumerState<LoginPage> createState() => _LoginPageState();
@@ -56,10 +60,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         );
 
     if (success && mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomePage()),
-      );
+      if (widget.popOnSuccess) {
+        Navigator.pop(context);
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomePage()),
+        );
+      }
     }
   }
 
@@ -133,7 +141,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       const SizedBox(height: 24),
                       AuthTextField(
                         hintText: l10n.username,
-                        icon: Icons.person_outline_rounded,
+                        icon: Icons.alternate_email_rounded,
                         controller: _usernameController,
                       ),
                       AuthTextField(

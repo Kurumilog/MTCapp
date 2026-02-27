@@ -28,7 +28,7 @@ mixin _$UserModel {
   String get lastName => throw _privateConstructorUsedError;
   String? get surName => throw _privateConstructorUsedError;
   String? get phoneNumber => throw _privateConstructorUsedError;
-  List<String>? get roles => throw _privateConstructorUsedError;
+  List<RoleModel>? get roles => throw _privateConstructorUsedError;
 
   /// Serializes this UserModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -53,7 +53,7 @@ abstract class $UserModelCopyWith<$Res> {
     String lastName,
     String? surName,
     String? phoneNumber,
-    List<String>? roles,
+    List<RoleModel>? roles,
   });
 }
 
@@ -114,7 +114,7 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
             roles: freezed == roles
                 ? _value.roles
                 : roles // ignore: cast_nullable_to_non_nullable
-                      as List<String>?,
+                      as List<RoleModel>?,
           )
           as $Val,
     );
@@ -138,7 +138,7 @@ abstract class _$$UserModelImplCopyWith<$Res>
     String lastName,
     String? surName,
     String? phoneNumber,
-    List<String>? roles,
+    List<RoleModel>? roles,
   });
 }
 
@@ -198,7 +198,7 @@ class __$$UserModelImplCopyWithImpl<$Res>
         roles: freezed == roles
             ? _value._roles
             : roles // ignore: cast_nullable_to_non_nullable
-                  as List<String>?,
+                  as List<RoleModel>?,
       ),
     );
   }
@@ -215,7 +215,7 @@ class _$UserModelImpl implements _UserModel {
     required this.lastName,
     this.surName,
     this.phoneNumber,
-    final List<String>? roles,
+    final List<RoleModel>? roles,
   }) : _roles = roles;
 
   factory _$UserModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -235,9 +235,9 @@ class _$UserModelImpl implements _UserModel {
   final String? surName;
   @override
   final String? phoneNumber;
-  final List<String>? _roles;
+  final List<RoleModel>? _roles;
   @override
-  List<String>? get roles {
+  List<RoleModel>? get roles {
     final value = _roles;
     if (value == null) return null;
     if (_roles is EqualUnmodifiableListView) return _roles;
@@ -306,7 +306,7 @@ abstract class _UserModel implements UserModel {
     required final String lastName,
     final String? surName,
     final String? phoneNumber,
-    final List<String>? roles,
+    final List<RoleModel>? roles,
   }) = _$UserModelImpl;
 
   factory _UserModel.fromJson(Map<String, dynamic> json) =
@@ -327,7 +327,7 @@ abstract class _UserModel implements UserModel {
   @override
   String? get phoneNumber;
   @override
-  List<String>? get roles;
+  List<RoleModel>? get roles;
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.

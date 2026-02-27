@@ -14,6 +14,7 @@ class ApiConstants {
 
   // Users endpoints
   static const String users = '/users';
+  static String userById(int id) => '/users/$id';
 
   // Timeouts
   static const Duration connectTimeout = Duration(seconds: 15);

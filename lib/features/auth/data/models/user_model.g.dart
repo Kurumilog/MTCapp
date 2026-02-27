@@ -16,7 +16,7 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       surName: json['surName'] as String?,
       phoneNumber: json['phoneNumber'] as String?,
       roles: (json['roles'] as List<dynamic>?)
-          ?.map((e) => e as String)
+          ?.map((e) => RoleModel.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 

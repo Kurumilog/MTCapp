@@ -1,7 +1,9 @@
-/// Модель пользователя (данные из JWT payload или ответа бекенда).
+/// Модель пользователя (данные из ответа бекенда GET /users/{id}).
+/// Роли приходят как массив объектов: [{"id":1,"role":"admin","description":null}].
 library;
 
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'role_model.dart';
 
 part 'user_model.freezed.dart';
 part 'user_model.g.dart';
@@ -16,7 +18,7 @@ abstract class UserModel with _$UserModel {
     required String lastName,
     String? surName,
     String? phoneNumber,
-    List<String>? roles,
+    List<RoleModel>? roles,
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>

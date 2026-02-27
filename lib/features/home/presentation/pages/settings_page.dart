@@ -9,6 +9,7 @@ library;
 import 'package:flutter/material.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../main.dart' show localeProvider;
+import 'edit_profile_page.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -29,6 +30,25 @@ class SettingsPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         children: [
+          ListTile(
+            leading: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(Icons.manage_accounts_outlined, color: colorScheme.primary, size: 22),
+            ),
+            title: Text(l10n.editProfile),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const EditProfilePage()),
+            ),
+          ),
+          const Divider(),
           ListTile(
             leading: Container(
               width: 40,

@@ -90,6 +90,13 @@ class AppLocalizations {
       'passwordTooShort': 'Пароль должен быть не менее 8 символов',
       'passwordsDoNotMatch': 'Пароли не совпадают',
       'authError': 'Ошибка',
+      'profile': 'Профиль',
+      'editProfile': 'Личные данные',
+      'surName': 'Отчество',
+      'saveChanges': 'Сохранить',
+      'comingSoonFeature': 'Функция скоро будет доступна',
+      'loginToSeeProfile': 'Войдите в аккаунт',
+      'usernameCannotChange': 'Имя пользователя нельзя изменить',
     },
     'en': {
       // Navigation
@@ -153,6 +160,13 @@ class AppLocalizations {
       'passwordTooShort': 'Password must be at least 8 characters',
       'passwordsDoNotMatch': 'Passwords do not match',
       'authError': 'Error',
+      'profile': 'Profile',
+      'editProfile': 'Personal data',
+      'surName': 'Middle name',
+      'saveChanges': 'Save',
+      'comingSoonFeature': 'This feature is coming soon',
+      'loginToSeeProfile': 'Log in to your account',
+      'usernameCannotChange': 'Username cannot be changed',
     },
   };
 
@@ -223,6 +237,13 @@ class AppLocalizations {
   String get passwordTooShort => get('passwordTooShort');
   String get passwordsDoNotMatch => get('passwordsDoNotMatch');
   String get authError => get('authError');
+  String get profile => get('profile');
+  String get editProfile => get('editProfile');
+  String get surName => get('surName');
+  String get saveChanges => get('saveChanges');
+  String get comingSoonFeature => get('comingSoonFeature');
+  String get loginToSeeProfile => get('loginToSeeProfile');
+  String get usernameCannotChange => get('usernameCannotChange');
 }
 
 class _AppLocalizationsDelegate
