@@ -1,23 +1,89 @@
 /// 1) Общее назначение:
 ///    Экран входа (Login) для существующих пользователей (Material 3).
+///    Подключён к Riverpod AuthNotifier для реальной авторизации.
 /// 2) С какими файлами связан:
 ///    - lib/features/auth/presentation/widgets/auth_text_field.dart
 ///    - lib/features/auth/presentation/widgets/auth_button.dart
+///    - lib/features/auth/presentation/providers/auth_provider.dart
 /// 3) Описание функций:
-///    - build(): Логотип, M3 Card с полем email, кнопка входа.
+///    - build(): Логотип, M3 Card с полями username + password, кнопка входа.
 library;
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/l10n/app_localizations.dart';
 import '../widgets/auth_text_field.dart';
 import '../widgets/auth_button.dart';
+import '../providers/auth_provider.dart';
 import 'registration_page.dart';
+import '../../../home/presentation/pages/home_page.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  ConsumerState<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends ConsumerState<LoginPage> {
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleLogin() async {
+    final l10n = AppLocalizations.of(context);
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text;
+
+    if (username.isEmpty || password.isEmpty) {
+      _showError(l10n.fillAllFields);
+      return;
+    }
+
+    if (password.length < 8) {
+      _showError(l10n.passwordTooShort);
+      return;
+    }
+
+    final success = await ref.read(authNotifierProvider.notifier).login(
+          username: username,
+          password: password,
+        );
+
+    if (success && mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomePage()),
+      );
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red.shade700),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context);
+
+    // Слушаем состояние и показываем ошибку от сервера
+    ref.listen<AuthState>(authNotifierProvider, (prev, next) {
+      if (next is AuthError) {
+        _showError(next.message);
+      }
+    });
+
+    final authState = ref.watch(authNotifierProvider);
+    final isLoading = authState is AuthLoading;
 
     return Scaffold(
       body: SafeArea(
@@ -58,23 +124,31 @@ class LoginPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        'Добро пожаловать',
+                        l10n.welcome,
                         style: textTheme.headlineSmall?.copyWith(
                           color: colorScheme.primary,
                         ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 24),
-                      const AuthTextField(
-                        hintText: 'Электронная почта',
-                        icon: Icons.email_outlined,
-                        keyboardType: TextInputType.emailAddress,
+                      AuthTextField(
+                        hintText: l10n.username,
+                        icon: Icons.person_outline_rounded,
+                        controller: _usernameController,
+                      ),
+                      AuthTextField(
+                        hintText: l10n.password,
+                        icon: Icons.lock_outline_rounded,
+                        obscureText: true,
+                        controller: _passwordController,
                       ),
                       const SizedBox(height: 8),
-                      AuthButton(
-                        text: 'Войти',
-                        onPressed: () {},
-                      ),
+                      isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : AuthButton(
+                              text: l10n.loginAction,
+                              onPressed: _handleLogin,
+                            ),
                     ],
                   ),
                 ),
@@ -87,7 +161,7 @@ class LoginPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Еще нет аккаунта? ',
+                    l10n.noAccountPrompt,
                     style: textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
@@ -100,7 +174,7 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                     style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                    child: const Text('Зарегистрироваться'),
+                    child: Text(l10n.registerAction),
                   ),
                 ],
               ),

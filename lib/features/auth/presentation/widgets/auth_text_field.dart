@@ -14,6 +14,7 @@ class AuthTextField extends StatelessWidget {
   final TextCapitalization textCapitalization;
   final TextInputType? keyboardType;
   final bool obscureText;
+  final TextEditingController? controller;
 
   const AuthTextField({
     super.key,
@@ -22,6 +23,7 @@ class AuthTextField extends StatelessWidget {
     this.textCapitalization = TextCapitalization.none,
     this.keyboardType,
     this.obscureText = false,
+    this.controller,
   });
 
   @override
@@ -29,6 +31,7 @@ class AuthTextField extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: TextField(
+        controller: controller,
         textCapitalization: textCapitalization,
         keyboardType: keyboardType,
         obscureText: obscureText,

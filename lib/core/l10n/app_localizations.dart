@@ -1,14 +1,13 @@
-/**
- * 1) Общее назначение:
- *    Обеспечивает поддержку многоязычности (RU/EN) в приложении.
- * 2) С какими файлами связан:
- *    - Используется во всех UI-компонентах через AppLocalizations.of(context).
- *    - Настраивается в lib/main.dart.
- * 3) Описание функций:
- *    - AppLocalizations: Класс-контейнер для строк перевода.
- *    - delegate: Делегат для загрузки локализации в MaterialApp.
- *    - get(): Метод для получения строки по ключу с фолбеком на английский.
- */
+/// 1) Общее назначение:
+///    Обеспечивает поддержку многоязычности (RU/EN) в приложении.
+/// 2) С какими файлами связан:
+///    - Используется во всех UI-компонентах через AppLocalizations.of(context).
+///    - Настраивается в lib/main.dart.
+/// 3) Описание функций:
+///    - AppLocalizations: Класс-контейнер для строк перевода.
+///    - delegate: Делегат для загрузки локализации в MaterialApp.
+///    - get(): Метод для получения строки по ключу с фолбеком на английский.
+library;
 import 'package:flutter/material.dart';
 
 class AppLocalizations {
@@ -78,6 +77,19 @@ class AppLocalizations {
       'name': 'Имя',
       'noAccount': 'Нет аккаунта?',
       'hasAccount': 'Уже есть аккаунт?',
+      'username': 'Имя пользователя',
+      'firstName': 'Имя',
+      'lastName': 'Фамилия',
+      'phoneNumber': 'Номер телефона',
+      'registerAction': 'Зарегистрироваться',
+      'loginAction': 'Войти',
+      'registerTitle': 'Зарегистрируйтесь',
+      'noAccountPrompt': 'Еще нет аккаунта? ',
+      'hasAccountPrompt': 'Уже зарегистрированы? ',
+      'fillAllFields': 'Заполните все поля',
+      'passwordTooShort': 'Пароль должен быть не менее 8 символов',
+      'passwordsDoNotMatch': 'Пароли не совпадают',
+      'authError': 'Ошибка',
     },
     'en': {
       // Navigation
@@ -128,6 +140,19 @@ class AppLocalizations {
       'name': 'Name',
       'noAccount': 'No account?',
       'hasAccount': 'Already have an account?',
+      'username': 'Username',
+      'firstName': 'First name',
+      'lastName': 'Last name',
+      'phoneNumber': 'Phone number',
+      'registerAction': 'Register',
+      'loginAction': 'Log in',
+      'registerTitle': 'Create account',
+      'noAccountPrompt': "Don't have an account? ",
+      'hasAccountPrompt': 'Already registered? ',
+      'fillAllFields': 'Fill in all fields',
+      'passwordTooShort': 'Password must be at least 8 characters',
+      'passwordsDoNotMatch': 'Passwords do not match',
+      'authError': 'Error',
     },
   };
 
@@ -185,6 +210,19 @@ class AppLocalizations {
   String get name => get('name');
   String get noAccount => get('noAccount');
   String get hasAccount => get('hasAccount');
+  String get username => get('username');
+  String get firstName => get('firstName');
+  String get lastName => get('lastName');
+  String get phoneNumber => get('phoneNumber');
+  String get registerAction => get('registerAction');
+  String get loginAction => get('loginAction');
+  String get registerTitle => get('registerTitle');
+  String get noAccountPrompt => get('noAccountPrompt');
+  String get hasAccountPrompt => get('hasAccountPrompt');
+  String get fillAllFields => get('fillAllFields');
+  String get passwordTooShort => get('passwordTooShort');
+  String get passwordsDoNotMatch => get('passwordsDoNotMatch');
+  String get authError => get('authError');
 }
 
 class _AppLocalizationsDelegate
