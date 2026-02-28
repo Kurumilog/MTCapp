@@ -5,6 +5,7 @@
 /// 3) Описание функций:
 ///    - isReversed: зарезервировано для будущих декоративных вариантов.
 library;
+
 import 'package:flutter/material.dart';
 
 class AuthBackground extends StatelessWidget {

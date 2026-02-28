@@ -3,6 +3,7 @@
 /// 2) С какими файлами связан:
 ///    - Встраивается в HomePage.
 library;
+
 import 'package:flutter/material.dart';
 import '../../../../core/l10n/app_localizations.dart';
 
@@ -28,10 +29,7 @@ class GalleryPage extends StatelessWidget {
               color: colorScheme.primary.withValues(alpha: 0.3),
             ),
             SizedBox(height: size.height * 0.02),
-            Text(
-              l10n.galleryTitle,
-              style: textTheme.headlineMedium,
-            ),
+            Text(l10n.galleryTitle, style: textTheme.headlineMedium),
             SizedBox(height: size.height * 0.01),
             Text(
               l10n.gallerySubtitle,

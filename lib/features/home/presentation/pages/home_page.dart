@@ -7,6 +7,7 @@
 ///    - _onDestinationSelected(): переключение вкладок.
 ///    - _showAddSheet(): BottomSheet добавления файлов (камера / галерея / файлы).
 library;
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
@@ -133,10 +134,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
-      ),
+      body: IndexedStack(index: _currentIndex, children: _pages),
       bottomNavigationBar: _BottomNavBar(
         currentIndex: _currentIndex,
         onTap: (index) {
@@ -179,17 +177,43 @@ class _BottomNavBar extends StatelessWidget {
 
     // Маппинг: визуальные индексы 0,1,_,3,4 → страницы 0,1,_,2,3
     final items = [
-      _NavItem(icon: Icons.star_outline_rounded, activeIcon: Icons.star_rounded,    label: l10n.favorites,   pageIndex: 0, visualIndex: 0),
-      _NavItem(icon: Icons.photo_library_outlined, activeIcon: Icons.photo_library_rounded, label: l10n.gallery,  pageIndex: 1, visualIndex: 1),
+      _NavItem(
+        icon: Icons.star_outline_rounded,
+        activeIcon: Icons.star_rounded,
+        label: l10n.favorites,
+        pageIndex: 0,
+        visualIndex: 0,
+      ),
+      _NavItem(
+        icon: Icons.photo_library_outlined,
+        activeIcon: Icons.photo_library_rounded,
+        label: l10n.gallery,
+        pageIndex: 1,
+        visualIndex: 1,
+      ),
       null, // «+» кнопка
-      _NavItem(icon: Icons.folder_outlined, activeIcon: Icons.folder_rounded,       label: l10n.collections, pageIndex: 2, visualIndex: 3),
-      _NavItem(icon: Icons.more_horiz_rounded, activeIcon: Icons.more_horiz_rounded, label: l10n.more,        pageIndex: 3, visualIndex: 4),
+      _NavItem(
+        icon: Icons.folder_outlined,
+        activeIcon: Icons.folder_rounded,
+        label: l10n.collections,
+        pageIndex: 2,
+        visualIndex: 3,
+      ),
+      _NavItem(
+        icon: Icons.more_horiz_rounded,
+        activeIcon: Icons.more_horiz_rounded,
+        label: l10n.more,
+        pageIndex: 3,
+        visualIndex: 4,
+      ),
     ];
 
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        border: Border(top: BorderSide(color: colorScheme.outlineVariant, width: 0.5)),
+        border: Border(
+          top: BorderSide(color: colorScheme.outlineVariant, width: 0.5),
+        ),
       ),
       child: SafeArea(
         top: false,
@@ -213,13 +237,19 @@ class _BottomNavBar extends StatelessWidget {
                             borderRadius: BorderRadius.circular(fabRadius),
                             boxShadow: [
                               BoxShadow(
-                                color: colorScheme.primary.withValues(alpha: 0.22),
+                                color: colorScheme.primary.withValues(
+                                  alpha: 0.22,
+                                ),
                                 blurRadius: fabSize * 0.75,
                                 spreadRadius: fabSize * 0.04,
                               ),
                             ],
                           ),
-                          child: Icon(Icons.add_rounded, color: colorScheme.onPrimary, size: iconSize * 1.1),
+                          child: Icon(
+                            Icons.add_rounded,
+                            color: colorScheme.onPrimary,
+                            size: iconSize * 1.1,
+                          ),
                         ),
                       ),
                     ),
@@ -245,15 +275,17 @@ class _BottomNavBar extends StatelessWidget {
                           SizedBox(height: size.height * 0.003),
                           Text(
                             items[i]!.label,
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              fontSize: fontSize,
-                              color: currentIndex == items[i]!.pageIndex
-                                  ? colorScheme.primary
-                                  : colorScheme.onSurfaceVariant,
-                              fontWeight: currentIndex == items[i]!.pageIndex
-                                  ? FontWeight.w600
-                                  : FontWeight.normal,
-                            ),
+                            style: Theme.of(context).textTheme.labelSmall
+                                ?.copyWith(
+                                  fontSize: fontSize,
+                                  color: currentIndex == items[i]!.pageIndex
+                                      ? colorScheme.primary
+                                      : colorScheme.onSurfaceVariant,
+                                  fontWeight:
+                                      currentIndex == items[i]!.pageIndex
+                                      ? FontWeight.w600
+                                      : FontWeight.normal,
+                                ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),

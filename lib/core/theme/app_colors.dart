@@ -5,6 +5,7 @@
 /// 3) Описание:
 ///    Только те константы, которых нет в ColorScheme (accent, surface-варианты).
 library;
+
 import 'package:flutter/material.dart';
 
 class AppColors {

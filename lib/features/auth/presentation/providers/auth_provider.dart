@@ -1,5 +1,15 @@
-/// Riverpod-провайдеры для auth feature.
-/// Содержит состояние авторизации и методы login/register/logout.
+/// 1) Общее назначение:
+///    Riverpod-провайдеры и состояния (StateNotifier) для модуля авторизации.
+/// 2) С какими файлами связан:
+///    - `auth_repository.dart` (вызовы логики регистрации, авторизации и выхода).
+///    - DI: `core_providers.dart`, `auth_remote_datasource.dart`.
+///    - UI: используется в страницах `login_page.dart`, `registration_page.dart` и для редиректа в `main.dart`.
+/// 3) Описание функций:
+///    - `AuthState` (и наследники): описывают текущее состояние пользователя (загрузка, ошибка, авторизован, нет).
+///    - `AuthNotifier`:
+///      - `checkAuthStatus()` проверяет наличие токенов.
+///      - `login()` и `register()` выполняют запросы к репозиторию и меняют state.
+///      - `logout()` очищает токены.
 library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -73,13 +83,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
     return switch (result) {
       AuthSuccess() => () {
-          state = const AuthAuthenticated();
-          return true;
-        }(),
+        state = const AuthAuthenticated();
+        return true;
+      }(),
       AuthFailure(:final message) => () {
-          state = AuthError(message);
-          return false;
-        }(),
+        state = AuthError(message);
+        return false;
+      }(),
     };
   }
 
@@ -109,13 +119,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
     return switch (result) {
       AuthSuccess() => () {
-          state = const AuthAuthenticated();
-          return true;
-        }(),
+        state = const AuthAuthenticated();
+        return true;
+      }(),
       AuthFailure(:final message) => () {
-          state = AuthError(message);
-          return false;
-        }(),
+        state = AuthError(message);
+        return false;
+      }(),
     };
   }
 
@@ -127,8 +137,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
 }
 
 /// Провайдер для AuthNotifier.
-final authNotifierProvider =
-    StateNotifierProvider<AuthNotifier, AuthState>((ref) {
+final authNotifierProvider = StateNotifierProvider<AuthNotifier, AuthState>((
+  ref,
+) {
   final repository = ref.watch(authRepositoryProvider);
   return AuthNotifier(repository);
 });

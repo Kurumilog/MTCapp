@@ -5,17 +5,14 @@
 /// 3) Описание функций:
 ///    - build(): FilledButton на всю ширину с фирменным красным цветом MTC.
 library;
+
 import 'package:flutter/material.dart';
 
 class AuthButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
-  const AuthButton({
-    super.key,
-    required this.text,
-    required this.onPressed,
-  });
+  const AuthButton({super.key, required this.text, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -24,10 +21,7 @@ class AuthButton extends StatelessWidget {
       child: SizedBox(
         width: double.infinity,
         height: 56,
-        child: FilledButton(
-          onPressed: onPressed,
-          child: Text(text),
-        ),
+        child: FilledButton(onPressed: onPressed, child: Text(text)),
       ),
     );
   }

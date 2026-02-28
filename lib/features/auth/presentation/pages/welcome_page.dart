@@ -8,6 +8,7 @@
 /// 3) Описание функций:
 ///    - build(): Логотип, приветственный текст, FilledButton + OutlinedButton, ссылки внизу.
 library;
+
 import 'package:flutter/material.dart';
 import '../widgets/auth_button.dart';
 import 'registration_page.dart';
@@ -32,11 +33,7 @@ class WelcomePage extends StatelessWidget {
               const Spacer(flex: 1),
 
               // Logo
-              Icon(
-                Icons.cloud_rounded,
-                color: colorScheme.primary,
-                size: 96,
-              ),
+              Icon(Icons.cloud_rounded, color: colorScheme.primary, size: 96),
               const SizedBox(height: 24),
 
               Text(

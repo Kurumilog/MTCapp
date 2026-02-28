@@ -5,6 +5,7 @@
 ///    - Переход на settings_page.dart.
 ///    - lib/features/home/presentation/providers/user_provider.dart
 library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_localizations.dart';
@@ -100,7 +101,8 @@ class MorePage extends ConsumerWidget {
           const SizedBox(height: 16),
           userAsync.when(
             loading: () => const CircularProgressIndicator(),
-            error: (_, e) => _buildLoginPrompt(context, l10n, colorScheme, textTheme),
+            error: (_, e) =>
+                _buildLoginPrompt(context, l10n, colorScheme, textTheme),
             data: (user) => user != null
                 ? _buildUserInfo(context, colorScheme, user)
                 : _buildLoginPrompt(context, l10n, colorScheme, textTheme),
@@ -134,12 +136,16 @@ class MorePage extends ConsumerWidget {
           '@${user.username}',
           style: textTheme.bodyMedium?.copyWith(color: colorScheme.primary),
         ),
-        if (user.phoneNumber != null && user.phoneNumber!.isNotEmpty) ...[  
+        if (user.phoneNumber != null && user.phoneNumber!.isNotEmpty) ...[
           const SizedBox(height: 6),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.phone_outlined, size: 14, color: colorScheme.onSurfaceVariant),
+              Icon(
+                Icons.phone_outlined,
+                size: 14,
+                color: colorScheme.onSurfaceVariant,
+              ),
               const SizedBox(width: 4),
               Text(
                 user.phoneNumber!,
@@ -154,7 +160,11 @@ class MorePage extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.email_outlined, size: 14, color: colorScheme.onSurfaceVariant),
+            Icon(
+              Icons.email_outlined,
+              size: 14,
+              color: colorScheme.onSurfaceVariant,
+            ),
             const SizedBox(width: 4),
             Text(
               user.email,
@@ -222,9 +232,9 @@ class MorePage extends ConsumerWidget {
       ),
       child: Text(
         l10n.comingSoon,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: colorScheme.onSurfaceVariant,
-        ),
+        style: Theme.of(
+          context,
+        ).textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
       ),
     );
   }

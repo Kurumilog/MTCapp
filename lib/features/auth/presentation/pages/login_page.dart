@@ -8,6 +8,7 @@
 /// 3) Описание функций:
 ///    - build(): Логотип, M3 Card с полями username + password, кнопка входа.
 library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_localizations.dart';
@@ -54,10 +55,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       return;
     }
 
-    final success = await ref.read(authNotifierProvider.notifier).login(
-          username: username,
-          password: password,
-        );
+    final success = await ref
+        .read(authNotifierProvider.notifier)
+        .login(username: username, password: password);
 
     if (success && mounted) {
       if (widget.popOnSuccess) {
@@ -106,7 +106,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.cloud_rounded, color: colorScheme.primary, size: 36),
+                  Icon(
+                    Icons.cloud_rounded,
+                    color: colorScheme.primary,
+                    size: 36,
+                  ),
                   const SizedBox(width: 10),
                   Text(
                     'MTC Cloud',

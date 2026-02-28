@@ -8,6 +8,7 @@
 /// 3) Описание функций:
 ///    - build(): Логотип, M3 Card с полями регистрации и кнопкой.
 library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_localizations.dart';
@@ -75,7 +76,9 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
       return;
     }
 
-    final success = await ref.read(authNotifierProvider.notifier).register(
+    final success = await ref
+        .read(authNotifierProvider.notifier)
+        .register(
           username: username,
           password: password,
           email: email,
@@ -127,7 +130,11 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.cloud_rounded, color: colorScheme.primary, size: 36),
+                  Icon(
+                    Icons.cloud_rounded,
+                    color: colorScheme.primary,
+                    size: 36,
+                  ),
                   const SizedBox(width: 10),
                   Text(
                     'MTC Cloud',
@@ -228,9 +235,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                   TextButton(
                     onPressed: () => Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(
-                        builder: (_) => const LoginPage(),
-                      ),
+                      MaterialPageRoute(builder: (_) => const LoginPage()),
                     ),
                     style: TextButton.styleFrom(padding: EdgeInsets.zero),
                     child: Text(l10n.loginAction),

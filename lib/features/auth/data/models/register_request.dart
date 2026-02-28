@@ -1,4 +1,11 @@
-/// Модель запроса на регистрацию — соответствует CreateUserDto бекенда.
+/// 1) Общее назначение:
+///    Модель DTO (Data Transfer Object) для создания запроса на регистрацию нового пользователя.
+/// 2) С какими файлами связан:
+///    - `auth_remote_datasource.dart` (передача данных в POST /auth/register).
+///    - Напрямую связан со сгенерированным кодом freezed/json_serializable.
+/// 3) Описание функций:
+///    - Содержит поля username, password, email, firstName, lastName, surName (опционально) и phoneNumber.
+///    - `toJson()` и `fromJson()` генерируются автоматически.
 library;
 
 import 'package:freezed_annotation/freezed_annotation.dart';

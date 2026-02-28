@@ -13,6 +13,7 @@
 ///    - MyApp: Корневой StatelessWidget, слушающий смену локали.
 ///    - AuthGate: Проверяет наличие токенов и решает начальный маршрут.
 library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -83,8 +84,8 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 
     return switch (authState) {
       AuthInitial() => const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        ),
+        body: Center(child: CircularProgressIndicator()),
+      ),
       AuthAuthenticated() => const HomePage(),
       _ => const WelcomePage(),
     };

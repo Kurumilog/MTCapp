@@ -7,6 +7,7 @@
 ///    - LocaleProvider: ChangeNotifier, хранящий текущую локаль.
 ///    - setLocale(): Метод для обновления локали и уведомления слушателей.
 library;
+
 import 'package:flutter/material.dart';
 
 class LocaleProvider extends ChangeNotifier {

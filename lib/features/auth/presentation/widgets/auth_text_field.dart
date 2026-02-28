@@ -6,6 +6,7 @@
 /// 3) Описание функций:
 ///    - build(): TextField с prefixIcon и hintText, стилизованный по M3.
 library;
+
 import 'package:flutter/material.dart';
 
 class AuthTextField extends StatelessWidget {
@@ -35,10 +36,7 @@ class AuthTextField extends StatelessWidget {
         textCapitalization: textCapitalization,
         keyboardType: keyboardType,
         obscureText: obscureText,
-        decoration: InputDecoration(
-          hintText: hintText,
-          prefixIcon: Icon(icon),
-        ),
+        decoration: InputDecoration(hintText: hintText, prefixIcon: Icon(icon)),
       ),
     );
   }

@@ -1,4 +1,11 @@
-/// Модель запроса на логин — соответствует LoginUserDto бекенда.
+/// 1) Общее назначение:
+///    Модель DTO для запроса на вход (логин).
+/// 2) С какими файлами связан:
+///    - `auth_remote_datasource.dart` (передача данных в POST /auth/login).
+///    - Связан со сгенерированным кодом freezed/json_serializable.
+/// 3) Описание функций:
+///    - Содержит обязательные поля username и password.
+///    - `toJson()`: преобразует объект в JSON для Dio.
 library;
 
 import 'package:freezed_annotation/freezed_annotation.dart';

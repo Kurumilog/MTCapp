@@ -1,5 +1,13 @@
-/// Репозиторий авторизации — координирует datasource и token storage.
-/// Единственная точка входа для auth-логики из presentation-слоя.
+/// 1) Общее назначение:
+///    Репозиторий авторизации, координирует удаленный источник данных (AuthRemoteDataSource) и локальное хранилище токенов.
+/// 2) С какими файлами связан:
+///    - `auth_remote_datasource.dart`, `token_storage.dart`.
+///    - Возвращает результаты для `auth_provider.dart`.
+/// 3) Описание функций:
+///    - `register()` и `login()`: делегируют вызовы источнику данных, сохраняют полученные токены и юзера.
+///    - Возвращают sealed class `AuthResult` (успех или отловленная ошибка `AuthFailure`).
+///    - `logout()`: очищает `TokenStorage`.
+///    - `isAuthenticated()`: проверяет наличие сессии.
 library;
 
 import 'package:dio/dio.dart';
@@ -59,9 +67,18 @@ class AuthRepository {
     return _tokenStorage.hasTokens();
   }
 
-  /// Выход — удаляет все токены.
+  /// Выход — сначала инвалидируем сессию на сервере, затем чистим локальные данные.
   Future<void> logout() async {
-    await _tokenStorage.clearAll();
+    try {
+      final refreshToken = await _tokenStorage.getRefreshToken();
+      if (refreshToken != null) {
+        await _dataSource.logout(refreshToken);
+      }
+    } catch (_) {
+      // Даже если серверный logout упал, всё равно чистим локальные данные.
+    } finally {
+      await _tokenStorage.clearAll();
+    }
   }
 
   String _extractErrorMessage(DioException e) {

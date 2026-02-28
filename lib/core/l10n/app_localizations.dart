@@ -8,6 +8,7 @@
 ///    - delegate: Делегат для загрузки локализации в MaterialApp.
 ///    - get(): Метод для получения строки по ключу с фолбеком на английский.
 library;
+
 import 'package:flutter/material.dart';
 
 class AppLocalizations {
@@ -22,10 +23,7 @@ class AppLocalizations {
   static const LocalizationsDelegate<AppLocalizations> delegate =
       _AppLocalizationsDelegate();
 
-  static const List<Locale> supportedLocales = [
-    Locale('ru'),
-    Locale('en'),
-  ];
+  static const List<Locale> supportedLocales = [Locale('ru'), Locale('en')];
 
   static final Map<String, Map<String, String>> _localizedValues = {
     'ru': {
@@ -97,6 +95,15 @@ class AppLocalizations {
       'comingSoonFeature': 'Функция скоро будет доступна',
       'loginToSeeProfile': 'Войдите в аккаунт',
       'usernameCannotChange': 'Имя пользователя нельзя изменить',
+      'enterCurrentPassword': 'Для сохранения изменений введите текущий пароль',
+      'cancel': 'Отмена',
+      'confirm': 'Подтвердить',
+      'profileUpdated': 'Данные успешно обновлены',
+      'noChanges': 'Вы ничего не изменили',
+      'wrongPassword': 'Неверный пароль',
+      'updateError': 'Ошибка обновления профиля',
+      'logout': 'Выйти из аккаунта',
+      'logoutConfirm': 'Вы уверены, что хотите выйти?',
     },
     'en': {
       // Navigation
@@ -167,6 +174,15 @@ class AppLocalizations {
       'comingSoonFeature': 'This feature is coming soon',
       'loginToSeeProfile': 'Log in to your account',
       'usernameCannotChange': 'Username cannot be changed',
+      'enterCurrentPassword': 'Enter your current password to save changes',
+      'cancel': 'Cancel',
+      'confirm': 'Confirm',
+      'profileUpdated': 'Profile updated successfully',
+      'noChanges': 'No changes were made',
+      'wrongPassword': 'Wrong password',
+      'updateError': 'Profile update error',
+      'logout': 'Log out',
+      'logoutConfirm': 'Are you sure you want to log out?',
     },
   };
 
@@ -244,6 +260,15 @@ class AppLocalizations {
   String get comingSoonFeature => get('comingSoonFeature');
   String get loginToSeeProfile => get('loginToSeeProfile');
   String get usernameCannotChange => get('usernameCannotChange');
+  String get enterCurrentPassword => get('enterCurrentPassword');
+  String get cancel => get('cancel');
+  String get confirm => get('confirm');
+  String get profileUpdated => get('profileUpdated');
+  String get noChanges => get('noChanges');
+  String get wrongPassword => get('wrongPassword');
+  String get updateError => get('updateError');
+  String get logout => get('logout');
+  String get logoutConfirm => get('logoutConfirm');
 }
 
 class _AppLocalizationsDelegate
@@ -251,8 +276,7 @@ class _AppLocalizationsDelegate
   const _AppLocalizationsDelegate();
 
   @override
-  bool isSupported(Locale locale) =>
-      ['ru', 'en'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => ['ru', 'en'].contains(locale.languageCode);
 
   @override
   Future<AppLocalizations> load(Locale locale) async {

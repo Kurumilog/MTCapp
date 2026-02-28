@@ -1,135 +1,168 @@
 # MTS Spacehack Backend: Deep Dive Architecture
 
-This document provides an exhaustive technical breakdown of the backend infrastructure, logic, and security patterns. It is designed to be highly detailed for both human developers and AI agents.
+This document provides an exhaustive technical breakdown of the backend infrastructure, logic, and security patterns. It is designed to be a definitive reference for developers and auditors.
 
 ---
 
-## 1. Entry Point & Global Configuration (`/src/main.ts`)
+## 1. System Entry & Global Pipeline (`src/main.ts`)
 
-The application lifecycle begins here. Key responsibilities:
+The application entry point configures the global request-response pipeline.
 
-- **Environment Management:** Dynamically loads `.env.prod` or `.env.dev` based on `NODE_ENV`.
-- **CORS Configuration:** Strictly defined to allow mobile/web clients. It permits standard methods (GET, POST, PUT, DELETE, PATCH) and exposes the `authorization` header.
-- **Global Prefix:** All API routes are prefixed with `/api`.
-- **Swagger Integration:** In non-production environments, a full OpenAPI 3.0 documentation suite is served at `/swagger`.
-- **Port Binding:** Defaults to `8080`, or follows the `PORT` environment variable.
+### 1.1. Middleware & Configuration
+
+- **Cookie Parser**: `app.use(cookieParser())` is registered to enable the server to parse the `Cookie` header into the `req.cookies` object. This is essential for the `HttpOnly` refresh token strategy.
+- **Environment Context**: Loads `.env.dev` or `.env.prod`.
+  - **Dev Note**: `DB_HOST` is set to `127.0.0.1` locally to bypass DNS/IPv6 resolution latencies common in development environments.
+- **Global Prefix**: All routes are encapsulated under the `/api` namespace.
+
+### 1.2. Global Validation Pipe
+
+The system uses a highly restrictive `ValidationPipe`:
+
+```typescript
+new ValidationPipe({
+  whitelist: true, // Strips properties not in the DTO
+  forbidNonWhitelisted: true, // Throws error if unexpected properties exist
+  transform: true, // Auto-transforms payloads to DTO instances
+});
+```
+
+This configuration prevents **Mass Assignment** attacks and ensures that the API strictly adheres to its interface.
 
 ---
 
-## 2. Modular Architecture (NestJS Core)
+## 2. Modular Structure
 
-The project is strictly modular, ensuring high maintainability and testability.
-
-- **`AppModule` (`src/modules/app.module.ts`)**: The root container that imports all feature modules.
-- **`DatabaseModule` (`src/modules/database.module.ts`)**: Handles the TypeORM connection to PostgreSQL. It features `synchronize: true` in development for automatic schema updates.
-- **`AuthModule` (`src/modules/auth.module.ts`)**: Manages the security perimeter, including JWT issuance, password hashing, and session persistence.
-- **`UsersModule` (`src/modules/users.module.ts`)**: Handles user profiles, role assignments, and permission mapping.
+- **`AppModule`**: The root module.
+- **`AuthModule`**: The security pillar. It configures the `JwtModule` asynchronously using `ConfigService` to ensure `JWT_SECRET` is loaded before the module initializes.
+- **`DatabaseModule`**: Manages the TypeORM lifecycle. In development, `synchronize: true` is enabled for schema agility.
 
 ---
 
-## 3. The Five-Layer Logic Flow
-
-The system follows a refined version of the **Layered Architecture** pattern:
+## 3. The Logic Layers (Deep Dive)
 
 ### 3.1. Entity Layer (`src/models/`)
 
-Defines the "Source of Truth" for the database.
+Entities represent the schema and include "Active Record" style hooks.
 
-- **`BaseEntityWithId`**: Abstract base class to ensure consistent Primary Key (`id`) naming.
-- **`User` Entity**: Contains core identity data. Includes a `@BeforeInsert()` / `@BeforeUpdate()` hook to automatically hash passwords using `AuthUtils`.
-- **`Role` & `Permission` Entities**: Implement **RBAC (Role-Based Access Control)**. Roles have a "many-to-many" relationship with Permissions and Users.
-- **`Session` Entity**: Specifically stores `refresh_token` strings, linking one or more active devices to a single user.
+#### **User Entity & Hashing Lifecycle**
+
+- **Before**: Blindly hashed `password` on every `BeforeUpdate`, leading to "Double Hashing" if the profile was updated without changing the password.
+- **After (Security Fix)**:
+  - `AfterLoad() @originalPassword = password`: Stores the hash when the entity is fetched.
+  - `BeforeUpdate()`: Only hashes if `this.password !== this.originalPassword`.
 
 ### 3.2. Repository Layer (`src/repositories/`)
 
-Encapsulates all database-specific operations.
+Repositories handle raw data access, abstracting TypeORM's complexity.
 
-- **`UserRepository`**: Extends TypeORM's `Repository`. Contains specialized methods like `findUserByEmailOrUsername`. No business logic is allowed here.
-- **`SessionRepository`**: Manages the "Token Rotation" logic at the database level (saving, finding, and updating tokens).
+- **Refactoring (Composition over Inheritance)**:
+  - **Before**: Custom classes extended `Repository<T>`. This often led to issues with NestJS's dependency injection and unit testing.
+  - **After**: Repositories are standard `@Injectable()` classes. They inject the TypeORM `Repository` via `@InjectRepository(Entity)`. This follow's NestJS best practices for decoupling.
 
-### 3.3. Service Layer (`src/services/`)
+### 3.3. Service Layer (`src/auth/`, `src/services/`)
 
-The "Brain" of the application where business rules live.
+Business logic lives here. Services are the only place where cross-entity orchestration occurs.
 
-- **`AuthService`**: Handles the heavy lifting of authentication.
-  - **Login/Register:** Validates credentials and calls `generateNewTokens()`.
-  - **Refresh Logic:** Implements **Refresh Token Rotation**, replacing old tokens with new ones upon use to prevent replay attacks.
-- **`UsersService`**: Orchestrates user-related tasks, coordinating between the `UserRepository` and other modules.
+#### **AuthService: Token Rotation Logic**
 
-### 3.4. Controller Layer (`src/controllers/`, `src/auth/`)
+1. **Login**: Generates an **Access Token** (JWT, 15m) and a **Refresh Token** (64-byte random hex).
+2. **Refresh (Rotation Pattern)**:
+   - When a user refreshes, the server finds the session by the old token.
+   - It generates a **brand new** refresh token.
+   - It updates the database record: `oldToken` is replaced by `newToken`.
+   - The old token is now invalid (Single-use tokens). This prevents replay attacks if a refresh token is stolen.
 
-The HTTP Interceptor layer.
+#### **AuthService: Transactional Safety**
 
-- **`AuthController`**: Exposes `/api/auth/register`, `/login`, and `/refresh`.
-- **`UsersController`**: Exposes `/api/users`. Crucially protected by decorators like `@HasRoles(Roles.ADMIN)`.
+```typescript
+await this.dataSource.transaction(async (manager) => {
+  await manager.save(User, user); // Update password
+  await manager.delete('Session', { user_id: user.id }); // Clear ALL sessions
+});
+```
 
-### 3.5. DTO Layer (`src/dto/`, `src/auth/dto/`)
+On password change, we use a **Database Transaction**. This ensures that if the password update succeeds, all existing sessions (logins on other devices) are nuked simultaneously. If one fails, neither happens.
 
-Data Transfer Objects ensure that incoming data is strictly validated before reaching the Controller.
+### 3.4. Controller Layer
 
-- **`CreateUserDto`**: Uses `class-validator` to enforce email formats, password length (min 8 chars), and phone number patterns.
-
----
-
-## 4. Security & Authentication Deep Dive
-
-### 4.1. JWT Strategy
-
-- **Access Token:**
-  - **Type:** JWT (Signed with `JWT_SECRET`).
-  - **Lifetime:** 15 minutes.
-  - **Transmission:** Passed in the `Authorization: Bearer <token>` header.
-  - **Payload:** `{ sub: userId, username: string, roles: string[] }`.
-- **Refresh Token:**
-  - **Type:** 64-character random hex string.
-  - **Storage:** Persisted in PostgreSQL (`sessions` table).
-  - **Lifetime:** Single-use (Rotation pattern).
-  - **Transmission:** Passed in the `Authorization: Bearer <token>` header during the refresh flow.
-
-### 4.2. Guards & Decorators
-
-- **`RolesGuard` (`src/auth/guards/roles.guard.ts`)**: A custom NestJS Guard that intercepts every request to protected routes. It verifies the JWT signature and checks if the `roles` array in the payload matches the requirements.
-- **`@HasRoles()` Decorator**: A custom metadata decorator used to tag routes with specific permission requirements (e.g., `admin`, `user`).
+- **`AuthController`**:
+  - **Cookie Transition**: Refresh tokens are now written to and read from `HttpOnly`, `Secure` cookies.
+  - **Endpoints**: `/auth/register`, `/auth/login`, `/auth/refresh`, `/auth/logout`, `/auth/logout_all`, and `/auth/change_password`.
+- **`UsersController`**:
+  - **Identity Protection**: Exposes `/api/users`. Sensitive operations are protected by `RolesGuard`.
+  - **Update Logic**: `PATCH /api/users/update_info` allows authenticated users to update their own profile data (email, phone, name). To prevent account takeovers, it requires the user's current password in the `UpdateUserDto`.
 
 ---
 
-## 5. Deployment & DevOps Infrastructure
+## 4. Security Flow Diagrams
 
-- **Dockerization:**
-  - `Dockerfile`: Multi-stage build for a lean production image.
-  - `docker-compose.yml`: Orchestrates the NestJS container and a PostgreSQL 15 container.
-- **Environment Separation:**
-  - `.env.dev`: Local development settings.
-  - `.env.prod`: Production-ready settings with restricted access.
+### 4.1. Authentication Sequence (Login)
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant AuthController
+    participant AuthService
+    participant SessionRepo
+    participant DB
+
+    Client->>AuthController: POST /auth/login (username, password)
+    AuthController->>AuthService: login(dto)
+    AuthService->>DB: Find User by Username
+    AuthService->>AuthService: Validate Bcrypt Hash
+    AuthService->>AuthService: generateNewTokens(userId)
+    AuthService->>SessionRepo: addSession(userId, randomToken)
+    SessionRepo->>DB: INSERT INTO sessions
+    AuthService-->>AuthController: { accessToken, refreshToken }
+    AuthController->>Client: Header: access_token, Cookie: refresh_token (HttpOnly)
+```
+
+### 4.2. Token Refresh Sequence (Rotation)
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant AuthController
+    participant AuthService
+    participant SessionRepo
+    participant DB
+
+    Client->>AuthController: POST /auth/refresh (includes Cookie)
+    AuthController->>AuthService: refresh(cookieToken)
+    AuthService->>SessionRepo: findSessionByToken(cookieToken)
+    SessionRepo->>DB: SELECT * FROM sessions JOIN users
+    AuthService->>AuthService: updateTokens(userId, oldToken)
+    AuthService->>SessionRepo: updateToken(oldToken, newToken)
+    SessionRepo->>DB: UPDATE sessions SET token = newToken
+    AuthService-->>AuthController: { accessToken, refreshToken }
+    AuthController->>Client: New Header + New Cookie
+```
 
 ---
 
----
+## 5. Deployment & Runtime Infrastructure
 
-## 7. Production Infrastructure (DigitalOcean)
+### 5.1. Docker Strategy
 
-- **Entry Point:** Public IP `159.89.30.73` mapped to `kurumi.software`.
-- **Reverse Proxy:** Nginx (v1.24.0) handles SSL termination.
-- **SSL/TLS:** Let's Encrypt certificates managed via Certbot.
-- **Docker Network:**
-  - `mts_backend`: Internal NestJS container (Port 8080).
-  - `mts_postgres`: Internal PostgreSQL container (Port 5432).
-  - Both share the `mts_network` bridge.
+- **Image**: `node:25-slim`. Standardized on a modern LTS version.
+- **Multi-stage**: Builds the app in a `builder` stage, then copies only `dist` and `node_modules` to the production stage to keep image size minimal (~150MB).
 
----
+### 5.2. Networking
 
-## 8. Mobile Developer Quick Start
-
-- **Base URL:** `https://kurumi.software/api`
-- **Swagger UI:** `https://kurumi.software/swagger/`
-- **Authentication Flow:**
-  1. `POST /auth/register` to create a user.
-  2. `POST /auth/login` to receive `accessToken` and `refreshToken`.
-  3. Include `Authorization: Bearer <accessToken>` in all restricted requests.
-  4. If `401 Unauthorized` occurs, call `POST /auth/refresh` with the `refreshToken` in the `Authorization: Bearer <refreshToken>` header.
+- **Port 5050 (Dev)**: Mapped to avoid conflicts with other local services.
+- **Database Access**: The production DB is bound to `127.0.0.1` inside the VPS. External access (e.g., via DBeaver) is done strictly through an **SSH Tunnel**.
 
 ---
 
-## 9. Request Lifecycle Diagram
+## 6. Mobile Developer Guidance
 
-... [rest of the lifecycle remains the same]
+1. **Host**: `http://localhost:5050/api` (Local) / `https://kurumi.software/api` (Prod).
+2. **Credentials Storage**:
+   - Access Token: Store in secure memory (not persistent).
+   - Refresh Token: Handled by the browser/WebView cookie jar. Set `credentials: 'include'` in fetch calls.
+3. **Response Statuses to Handle**:
+   - `201/200`: Success.
+   - `400 PASSWORDS_IS_DUPLICATE`: User tried to change password to the current one.
+   - `401 MISSING_REFRESH_TOKEN`: User must log in again.
+   - `403 FORBIDDEN`: Insufficient roles/permissions.

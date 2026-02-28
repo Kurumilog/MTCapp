@@ -1,6 +1,13 @@
-/// Настройка Dio-клиента с интерцепторами для JWT.
-/// Автоматически добавляет accessToken в заголовки,
-/// при 401 — пытается обновить токен через /auth/refresh.
+/// 1) Общее назначение:
+///    Глобальная настройка HTTP-клиента Dio с интерцепторами для JWT и обработки 401 Unauthorized.
+/// 2) С какими файлами связан:
+///    - Использует `api_constants.dart` (для url/timeout).
+///    - Использует `token_storage.dart` (для чтения/сохранения токенов).
+///    - Зависимость инжектится во все модули `*_remote_datasource.dart`.
+/// 3) Описание функций:
+///    - `ApiClient`: инициализирует `Dio` и добавляет логгер (в debug) и `_AuthInterceptor`.
+///    - `_AuthInterceptor.onRequest`: добавляет `Authorization: Bearer <token>` в заголовок.
+///    - `_AuthInterceptor.onError`: ловит 401 и обновляет токены через `/auth/refresh`, затем повторяет исходный запрос.
 library;
 
 import 'package:dio/dio.dart';
@@ -51,10 +58,7 @@ class _AuthInterceptor extends Interceptor {
     RequestInterceptorHandler handler,
   ) async {
     // Не добавляем токен на публичные эндпоинты
-    final publicPaths = [
-      ApiConstants.register,
-      ApiConstants.login,
-    ];
+    final publicPaths = [ApiConstants.register, ApiConstants.login];
 
     final isPublic = publicPaths.any((path) => options.path.contains(path));
 
@@ -81,12 +85,12 @@ class _AuthInterceptor extends Interceptor {
         final response = await _dio.post(
           ApiConstants.refresh,
           options: Options(
-            headers: {'Authorization': 'Bearer $refreshToken'},
+            headers: {'Cookie': 'refresh_token=$refreshToken'},
           ),
         );
 
         final newAccessToken = response.headers.value('access_token') ?? '';
-        final newRefreshToken = response.headers.value('refresh_token') ?? '';
+        final newRefreshToken = _extractRefreshToken(response) ?? '';
 
         await _tokenStorage.saveTokens(
           accessToken: newAccessToken,
@@ -107,5 +111,19 @@ class _AuthInterceptor extends Interceptor {
     }
 
     handler.next(err);
+  }
+
+  /// Извлекает refresh_token из Set-Cookie заголовка.
+  String? _extractRefreshToken(Response<dynamic> response) {
+    final cookies = response.headers['set-cookie'];
+    if (cookies != null) {
+      for (final cookie in cookies) {
+        if (cookie.startsWith('refresh_token=')) {
+          return cookie.split(';').first.substring('refresh_token='.length);
+        }
+      }
+    }
+    // Фоллбек: кастомный заголовок
+    return response.headers.value('refresh_token');
   }
 }

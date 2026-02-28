@@ -5,6 +5,7 @@
 /// 3) Описание функций:
 ///    - get theme: возвращает ThemeData (Material 3) с фирменной палитрой MTC и шрифтом Nunito.
 library;
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
@@ -117,7 +118,10 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceVariant,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 18,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,
@@ -131,10 +135,11 @@ class AppTheme {
           borderSide: const BorderSide(color: AppColors.primaryRed, width: 1.5),
         ),
         hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 16),
-        prefixIconColor: WidgetStateColor.resolveWith((states) =>
-            states.contains(WidgetState.focused)
-                ? AppColors.primaryRed
-                : Colors.grey.shade500),
+        prefixIconColor: WidgetStateColor.resolveWith(
+          (states) => states.contains(WidgetState.focused)
+              ? AppColors.primaryRed
+              : Colors.grey.shade500,
+        ),
       ),
 
       // NavigationBar (M3)
@@ -157,10 +162,7 @@ class AppTheme {
               color: AppColors.primaryRed,
             );
           }
-          return GoogleFonts.nunito(
-            fontSize: 12,
-            color: Colors.grey.shade500,
-          );
+          return GoogleFonts.nunito(fontSize: 12, color: Colors.grey.shade500);
         }),
       ),
 

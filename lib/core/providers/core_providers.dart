@@ -1,5 +1,11 @@
-/// Riverpod-провайдеры для core-зависимостей:
-/// TokenStorage, ApiClient, Dio.
+/// 1) Общее назначение:
+///    Глобальные Riverpod-провайдеры для core-зависимостей приложения (хранилище токенов, API-клиент).
+/// 2) С какими файлами связан:
+///    - Связан с `token_storage.dart` и `api_client.dart`.
+///    - Используется в `auth_provider.dart` и `user_provider.dart` для внедрения зависимостей.
+/// 3) Описание функций:
+///    - `tokenStorageProvider`: синглтон-провайдер экземпляра `TokenStorage`.
+///    - `apiClientProvider`: провайдер `ApiClient`, зависящий от `tokenStorageProvider`.
 library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
