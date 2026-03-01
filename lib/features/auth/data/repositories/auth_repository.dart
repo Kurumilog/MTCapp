@@ -81,6 +81,25 @@ class AuthRepository {
     }
   }
 
+  /// Смена пароля текущего пользователя.
+  /// Возвращает null при успехе или код/текст ошибки при неудаче.
+  Future<String?> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    try {
+      await _dataSource.changePassword(
+        oldPassword: oldPassword,
+        newPassword: newPassword,
+      );
+      return null;
+    } on DioException catch (e) {
+      return _extractChangePasswordErrorMessage(e);
+    } catch (e) {
+      return 'Неизвестная ошибка: $e';
+    }
+  }
+
   String _extractErrorMessage(DioException e) {
     if (e.response?.data is Map<String, dynamic>) {
       final data = e.response!.data as Map<String, dynamic>;
@@ -89,6 +108,29 @@ class AuthRepository {
         return message.join(', ');
       }
       return message?.toString() ?? 'Ошибка сервера';
+    }
+
+    return switch (e.type) {
+      DioExceptionType.connectionTimeout => 'Таймаут подключения',
+      DioExceptionType.receiveTimeout => 'Сервер не отвечает',
+      DioExceptionType.connectionError => 'Нет соединения с сервером',
+      _ => 'Ошибка сети: ${e.message}',
+    };
+  }
+
+  String _extractChangePasswordErrorMessage(DioException e) {
+    if (e.response?.data is Map<String, dynamic>) {
+      final data = e.response!.data as Map<String, dynamic>;
+      final message = data['message']?.toString() ?? '';
+
+      if (message.contains('PASSWORD_IS_INCORRECT')) {
+        return 'PASSWORD_IS_INCORRECT';
+      }
+      if (message.contains('PASSWORDS_IS_DUPLICATE')) {
+        return 'PASSWORDS_IS_DUPLICATE';
+      }
+
+      return message.isNotEmpty ? message : 'Ошибка сервера';
     }
 
     return switch (e.type) {

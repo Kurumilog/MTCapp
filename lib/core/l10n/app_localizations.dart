@@ -59,6 +59,9 @@ class AppLocalizations {
       // Settings
       'settingsTitle': 'Настройки',
       'appLanguage': 'Язык приложения',
+      'appTheme': 'Тема приложения',
+      'lightTheme': 'Светлая',
+      'darkTheme': 'Тёмная',
       'russian': 'Русский',
       'english': 'English',
 
@@ -86,7 +89,11 @@ class AppLocalizations {
       'hasAccountPrompt': 'Уже зарегистрированы? ',
       'fillAllFields': 'Заполните все поля',
       'passwordTooShort': 'Пароль должен быть не менее 8 символов',
+        'passwordInvalidChars':
+          'Пароль может содержать только английские буквы, цифры и символы',
       'passwordsDoNotMatch': 'Пароли не совпадают',
+        'phoneInvalidFormat':
+          'Номер телефона может содержать только + и цифры',
       'authError': 'Ошибка',
       'profile': 'Профиль',
       'editProfile': 'Личные данные',
@@ -96,6 +103,13 @@ class AppLocalizations {
       'loginToSeeProfile': 'Войдите в аккаунт',
       'usernameCannotChange': 'Имя пользователя нельзя изменить',
       'enterCurrentPassword': 'Для сохранения изменений введите текущий пароль',
+      'currentPassword': 'Текущий пароль',
+      'newPassword': 'Новый пароль',
+      'confirmNewPassword': 'Подтвердите новый пароль',
+      'changePassword': 'Сменить пароль',
+      'passwordChanged': 'Пароль успешно изменен',
+      'wrongCurrentPassword': 'Текущий пароль указан неверно',
+      'passwordDuplicate': 'Новый пароль должен отличаться от текущего',
       'cancel': 'Отмена',
       'confirm': 'Подтвердить',
       'profileUpdated': 'Данные успешно обновлены',
@@ -138,6 +152,9 @@ class AppLocalizations {
       // Settings
       'settingsTitle': 'Settings',
       'appLanguage': 'App language',
+      'appTheme': 'App theme',
+      'lightTheme': 'Light',
+      'darkTheme': 'Dark',
       'russian': 'Русский',
       'english': 'English',
 
@@ -165,7 +182,11 @@ class AppLocalizations {
       'hasAccountPrompt': 'Already registered? ',
       'fillAllFields': 'Fill in all fields',
       'passwordTooShort': 'Password must be at least 8 characters',
+        'passwordInvalidChars':
+          'Password can contain only English letters, digits and symbols',
       'passwordsDoNotMatch': 'Passwords do not match',
+        'phoneInvalidFormat':
+          'Phone number can contain only + and digits',
       'authError': 'Error',
       'profile': 'Profile',
       'editProfile': 'Personal data',
@@ -175,6 +196,13 @@ class AppLocalizations {
       'loginToSeeProfile': 'Log in to your account',
       'usernameCannotChange': 'Username cannot be changed',
       'enterCurrentPassword': 'Enter your current password to save changes',
+      'currentPassword': 'Current password',
+      'newPassword': 'New password',
+      'confirmNewPassword': 'Confirm new password',
+      'changePassword': 'Change password',
+      'passwordChanged': 'Password changed successfully',
+      'wrongCurrentPassword': 'Current password is incorrect',
+      'passwordDuplicate': 'New password must be different from current',
       'cancel': 'Cancel',
       'confirm': 'Confirm',
       'profileUpdated': 'Profile updated successfully',
@@ -224,6 +252,9 @@ class AppLocalizations {
   // Settings
   String get settingsTitle => get('settingsTitle');
   String get appLanguage => get('appLanguage');
+  String get appTheme => get('appTheme');
+  String get lightTheme => get('lightTheme');
+  String get darkTheme => get('darkTheme');
   String get russian => get('russian');
   String get english => get('english');
 
@@ -251,7 +282,9 @@ class AppLocalizations {
   String get hasAccountPrompt => get('hasAccountPrompt');
   String get fillAllFields => get('fillAllFields');
   String get passwordTooShort => get('passwordTooShort');
+  String get passwordInvalidChars => get('passwordInvalidChars');
   String get passwordsDoNotMatch => get('passwordsDoNotMatch');
+  String get phoneInvalidFormat => get('phoneInvalidFormat');
   String get authError => get('authError');
   String get profile => get('profile');
   String get editProfile => get('editProfile');
@@ -261,6 +294,13 @@ class AppLocalizations {
   String get loginToSeeProfile => get('loginToSeeProfile');
   String get usernameCannotChange => get('usernameCannotChange');
   String get enterCurrentPassword => get('enterCurrentPassword');
+  String get currentPassword => get('currentPassword');
+  String get newPassword => get('newPassword');
+  String get confirmNewPassword => get('confirmNewPassword');
+  String get changePassword => get('changePassword');
+  String get passwordChanged => get('passwordChanged');
+  String get wrongCurrentPassword => get('wrongCurrentPassword');
+  String get passwordDuplicate => get('passwordDuplicate');
   String get cancel => get('cancel');
   String get confirm => get('confirm');
   String get profileUpdated => get('profileUpdated');

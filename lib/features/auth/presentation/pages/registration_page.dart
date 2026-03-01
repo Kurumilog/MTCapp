@@ -12,6 +12,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_localizations.dart';
+import '../../../../core/utils/input_validators.dart';
 import '../widgets/auth_text_field.dart';
 import '../widgets/auth_button.dart';
 import '../providers/auth_provider.dart';
@@ -71,6 +72,16 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
       return;
     }
 
+    if (!InputValidators.isAsciiPassword(password)) {
+      _showError(l10n.passwordInvalidChars);
+      return;
+    }
+
+    if (!InputValidators.isPhoneNumber(phone)) {
+      _showError(l10n.phoneInvalidFormat);
+      return;
+    }
+
     if (password != confirmPassword) {
       _showError(l10n.passwordsDoNotMatch);
       return;
@@ -88,9 +99,9 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         );
 
     if (success && mounted) {
-      Navigator.pushReplacement(
-        context,
+      Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const HomePage()),
+        (route) => false,
       );
     }
   }

@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/theme_provider.dart';
 import 'core/l10n/app_localizations.dart';
 import 'core/l10n/locale_provider.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
@@ -25,6 +26,7 @@ import 'features/auth/presentation/pages/welcome_page.dart';
 import 'features/home/presentation/pages/home_page.dart';
 
 final localeProvider = LocaleProvider();
+final themeProvider = ThemeProvider();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,11 +39,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: localeProvider,
+      listenable: Listenable.merge([localeProvider, themeProvider]),
       builder: (context, _) {
         return MaterialApp(
           title: 'MTC Cloud',
-          theme: AppTheme.theme,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeProvider.themeMode,
           debugShowCheckedModeBanner: false,
           locale: localeProvider.locale,
           supportedLocales: AppLocalizations.supportedLocales,

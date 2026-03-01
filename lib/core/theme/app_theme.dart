@@ -11,18 +11,34 @@ import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 class AppTheme {
-  static ThemeData get theme {
+  static ThemeData get theme => lightTheme;
+
+  static ThemeData get lightTheme {
+    return _buildTheme(Brightness.light);
+  }
+
+  static ThemeData get darkTheme {
+    return _buildTheme(Brightness.dark);
+  }
+
+  static ThemeData _buildTheme(Brightness brightness) {
+    final isDark = brightness == Brightness.dark;
+
+    final scaffoldColor = isDark ? const Color(0xFF111216) : Colors.white;
+    final surfaceVariant = isDark ? const Color(0xFF1E2128) : AppColors.surfaceVariant;
+    final onSurfaceColor = isDark ? const Color(0xFFE6E1E5) : AppColors.onSurface;
+
     final colorScheme = ColorScheme.fromSeed(
       seedColor: AppColors.primaryRed,
       primary: AppColors.primaryRed,
       onPrimary: Colors.white,
       secondary: AppColors.primaryRed,
       onSecondary: Colors.white,
-      surface: Colors.white,
-      onSurface: AppColors.onSurface,
-      surfaceContainerHighest: AppColors.surfaceVariant,
+      surface: scaffoldColor,
+      onSurface: onSurfaceColor,
+      surfaceContainerHighest: surfaceVariant,
       error: AppColors.primaryRed,
-      brightness: Brightness.light,
+      brightness: brightness,
     );
 
     final textTheme = GoogleFonts.nunitoTextTheme().copyWith(
@@ -47,11 +63,11 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       textTheme: textTheme,
-      scaffoldBackgroundColor: Colors.white,
+      scaffoldBackgroundColor: scaffoldColor,
 
       // AppBar
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.white,
+        backgroundColor: scaffoldColor,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0.5,
@@ -59,9 +75,9 @@ class AppTheme {
         titleTextStyle: GoogleFonts.nunito(
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          color: AppColors.onSurface,
+          color: onSurfaceColor,
         ),
-        iconTheme: const IconThemeData(color: AppColors.onSurface),
+        iconTheme: IconThemeData(color: onSurfaceColor),
       ),
 
       // FilledButton (AuthButton использует его)
@@ -104,12 +120,14 @@ class AppTheme {
 
       // Card
       cardTheme: CardThemeData(
-        color: Colors.white,
+        color: colorScheme.surface,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: Colors.grey.shade200),
+          side: BorderSide(
+            color: isDark ? const Color(0xFF2A2D34) : Colors.grey.shade200,
+          ),
         ),
         margin: EdgeInsets.zero,
       ),
@@ -117,7 +135,7 @@ class AppTheme {
       // InputDecoration (TextField)
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surfaceVariant,
+        fillColor: surfaceVariant,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 20,
           vertical: 18,
@@ -134,17 +152,20 @@ class AppTheme {
           borderRadius: BorderRadius.circular(14),
           borderSide: const BorderSide(color: AppColors.primaryRed, width: 1.5),
         ),
-        hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 16),
+        hintStyle: TextStyle(
+          color: isDark ? const Color(0xFF9BA0AA) : Colors.grey.shade500,
+          fontSize: 16,
+        ),
         prefixIconColor: WidgetStateColor.resolveWith(
           (states) => states.contains(WidgetState.focused)
               ? AppColors.primaryRed
-              : Colors.grey.shade500,
+              : (isDark ? const Color(0xFF9BA0AA) : Colors.grey.shade500),
         ),
       ),
 
       // NavigationBar (M3)
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         indicatorColor: AppColors.primaryRed.withValues(alpha: 0.12),
@@ -152,7 +173,9 @@ class AppTheme {
           if (states.contains(WidgetState.selected)) {
             return const IconThemeData(color: AppColors.primaryRed);
           }
-          return IconThemeData(color: Colors.grey.shade500);
+          return IconThemeData(
+            color: isDark ? const Color(0xFF9BA0AA) : Colors.grey.shade500,
+          );
         }),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
@@ -162,22 +185,25 @@ class AppTheme {
               color: AppColors.primaryRed,
             );
           }
-          return GoogleFonts.nunito(fontSize: 12, color: Colors.grey.shade500);
+          return GoogleFonts.nunito(
+            fontSize: 12,
+            color: isDark ? const Color(0xFF9BA0AA) : Colors.grey.shade500,
+          );
         }),
       ),
 
       // BottomSheet
-      bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: Colors.white,
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: colorScheme.surface,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
       ),
 
       // Divider
       dividerTheme: DividerThemeData(
-        color: Colors.grey.shade200,
+        color: isDark ? const Color(0xFF2A2D34) : Colors.grey.shade200,
         thickness: 0.5,
         space: 0,
       ),

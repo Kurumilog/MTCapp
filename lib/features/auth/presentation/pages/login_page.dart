@@ -12,6 +12,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_localizations.dart';
+import '../../../../core/utils/input_validators.dart';
 import '../widgets/auth_text_field.dart';
 import '../widgets/auth_button.dart';
 import '../providers/auth_provider.dart';
@@ -55,6 +56,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       return;
     }
 
+    if (!InputValidators.isAsciiPassword(password)) {
+      _showError(l10n.passwordInvalidChars);
+      return;
+    }
+
     final success = await ref
         .read(authNotifierProvider.notifier)
         .login(username: username, password: password);
@@ -63,9 +69,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       if (widget.popOnSuccess) {
         Navigator.pop(context);
       } else {
-        Navigator.pushReplacement(
-          context,
+        Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const HomePage()),
+          (route) => false,
         );
       }
     }

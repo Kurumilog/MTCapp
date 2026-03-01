@@ -88,3 +88,5 @@ app.*.map.json
 **/windows/cmake-build-debug/
 **/windows/cmake-build-profile/
 **/windows/cmake-build-release/
+
+app-*.apk

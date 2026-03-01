@@ -15,6 +15,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_localizations.dart';
+import '../../../../core/utils/input_validators.dart';
 import '../../../auth/data/models/update_request.dart';
 import '../../../auth/presentation/widgets/auth_text_field.dart';
 import '../../../auth/presentation/widgets/auth_button.dart';
@@ -88,16 +89,38 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       return;
     }
 
+    final phone = _phoneController.text.trim();
+    if (phone.isNotEmpty && !InputValidators.isPhoneNumber(phone)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.phoneInvalidFormat),
+          backgroundColor: colorScheme.error,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
     // Показываем диалог ввода пароля
     final password = await showDialog<String>(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => _PasswordConfirmDialog(l10n: l10n),
     );
+    if (!mounted) return;
 
     // Пользователь нажал «Отмена»
     if (password == null || password.isEmpty) return;
-    if (!mounted) return;
+    if (!InputValidators.isAsciiPassword(password)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.passwordInvalidChars),
+          backgroundColor: colorScheme.error,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
 
     setState(() => _saving = true);
 

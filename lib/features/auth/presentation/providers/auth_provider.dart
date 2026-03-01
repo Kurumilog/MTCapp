@@ -134,6 +134,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
     await _repository.logout();
     state = const AuthUnauthenticated();
   }
+
+  /// Смена пароля текущего пользователя.
+  /// Возвращает null при успехе или строку ошибки при неудаче.
+  Future<String?> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    return _repository.changePassword(
+      oldPassword: oldPassword,
+      newPassword: newPassword,
+    );
+  }
 }
 
 /// Провайдер для AuthNotifier.
