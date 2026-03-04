@@ -8,94 +8,80 @@
 ///    - _showAddSheet(): BottomSheet добавления файлов (камера / галерея / файлы).
 library;
 
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_picker/file_picker.dart';
-import '../../../../core/theme/app_colors.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../../core/l10n/app_localizations.dart';
-import 'favorites_page.dart';
-import 'gallery_page.dart';
-import 'collections_page.dart';
+import '../providers/corporate_cloud_stub_provider.dart';
+import 'files_page.dart';
 import 'more_page.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   int _currentIndex = 0;
-  final _imagePicker = ImagePicker();
 
-  // 4 реальных вкладки: Любимое / Галерея / Коллекции / Ещё
-  // Кнопка «+» — FAB, не вкладка
-  final List<Widget> _pages = const [
-    FavoritesPage(),
-    GalleryPage(),
-    CollectionsPage(),
-    MorePage(),
-  ];
+  final List<Widget> _pages = const [FilesPage(), MorePage()];
+
+  bool get _isWindowsPopup =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.windows;
 
   void _showAddSheet() {
+    if (_isWindowsPopup) {
+      _showWindowsDropDialog();
+      return;
+    }
+
+    _showMobileAddSheet();
+  }
+
+  Future<void> _showMobileAddSheet() async {
     final l10n = AppLocalizations.of(context);
 
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       builder: (context) {
         return SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24.0,
-              vertical: 20.0,
-            ),
+            padding: const EdgeInsets.all(16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Drag handle
-                Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 20),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                Text(
-                  l10n.addTitle,
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 12),
-                _buildAddOption(
-                  icon: Icons.photo_camera_outlined,
-                  label: l10n.takePhoto,
-                  onTap: () async {
-                    final nav = Navigator.of(context);
-                    nav.pop();
-                    await _imagePicker.pickImage(source: ImageSource.camera);
+                ListTile(
+                  leading: Icon(Icons.camera_alt_rounded,
+                      color: Theme.of(context).colorScheme.primary),
+                  title: Text(l10n.takePhoto),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _takePhoto();
                   },
                 ),
-                _buildAddOption(
-                  icon: Icons.photo_library_outlined,
-                  label: l10n.chooseFromGallery,
-                  onTap: () async {
-                    final nav = Navigator.of(context);
-                    nav.pop();
-                    await _imagePicker.pickMultiImage();
+                ListTile(
+                  leading: Icon(Icons.image_rounded,
+                      color: Theme.of(context).colorScheme.primary),
+                  title: Text(l10n.chooseFromGallery),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _pickFromGallery();
                   },
                 ),
-                _buildAddOption(
-                  icon: Icons.upload_file_outlined,
-                  label: l10n.uploadFile,
-                  onTap: () async {
-                    final nav = Navigator.of(context);
-                    nav.pop();
-                    await FilePicker.platform.pickFiles(allowMultiple: true);
+                ListTile(
+                  leading: Icon(Icons.description_rounded,
+                      color: Theme.of(context).colorScheme.primary),
+                  title: Text(l10n.uploadFile),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _pickFiles();
                   },
                 ),
-                const SizedBox(height: 8),
               ],
             ),
           ),
@@ -104,17 +90,180 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildAddOption({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return ListTile(
-      leading: Icon(icon, color: AppColors.primaryRed),
-      title: Text(label),
-      trailing: const Icon(Icons.chevron_right_rounded),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      onTap: onTap,
+  Future<void> _takePhoto() async {
+    final l10n = AppLocalizations.of(context);
+    final picker = ImagePicker();
+
+    try {
+      final photo = await picker.pickImage(source: ImageSource.camera);
+      if (photo == null) return;
+
+      final names = [photo.name];
+      await ref.read(corporateCloudProvider.notifier).uploadFiles(names);
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.uploadSuccess(names.length))),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.error)),
+      );
+    }
+  }
+
+  Future<void> _pickFromGallery() async {
+    final l10n = AppLocalizations.of(context);
+    final picker = ImagePicker();
+
+    try {
+      final images = await picker.pickMultiImage();
+      if (images.isEmpty) return;
+
+      final names = images
+          .map((image) => image.name)
+          .where((name) => name.trim().isNotEmpty)
+          .toList();
+      await ref.read(corporateCloudProvider.notifier).uploadFiles(names);
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.uploadSuccess(names.length))),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.error)),
+      );
+    }
+  }
+
+  Future<void> _pickFiles() async {
+    final l10n = AppLocalizations.of(context);
+
+    try {
+      final selected = await FilePicker.platform.pickFiles(allowMultiple: true);
+      if (selected == null || selected.files.isEmpty) return;
+
+      final names = selected.files
+          .map((file) => file.name)
+          .where((name) => name.trim().isNotEmpty)
+          .toList();
+      await ref.read(corporateCloudProvider.notifier).uploadFiles(names);
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.uploadSuccess(names.length))),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.error)),
+      );
+    }
+  }
+
+  Future<void> _showWindowsDropDialog() async {
+    final l10n = AppLocalizations.of(context);
+    List<String> droppedNames = [];
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Text(l10n.uploadDropTitle),
+              content: SizedBox(
+                width: 420,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DropTarget(
+                      onDragDone: (details) {
+                        setDialogState(() {
+                          droppedNames = details.files
+                              .map((file) => file.name)
+                              .where((name) => name.trim().isNotEmpty)
+                              .toList();
+                        });
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 30,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            const Icon(Icons.file_upload_outlined, size: 36),
+                            const SizedBox(height: 10),
+                            Text(
+                              l10n.uploadDropHint,
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton.icon(
+                        onPressed: () async {
+                          final picked = await FilePicker.platform.pickFiles(
+                            allowMultiple: true,
+                          );
+                          if (picked == null || picked.files.isEmpty) return;
+                          setDialogState(() {
+                            droppedNames = picked.files.map((f) => f.name).toList();
+                          });
+                        },
+                        icon: const Icon(Icons.folder_open_rounded),
+                        label: Text(l10n.chooseFile),
+                      ),
+                    ),
+                    if (droppedNames.isNotEmpty)
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          '${l10n.filesSelected}: ${droppedNames.length}',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: Text(l10n.cancel),
+                ),
+                FilledButton(
+                  onPressed: droppedNames.isEmpty
+                      ? null
+                      : () => Navigator.of(dialogContext).pop(),
+                  child: Text(l10n.uploadFile),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    if (droppedNames.isEmpty) return;
+    await ref.read(corporateCloudProvider.notifier).uploadFiles(droppedNames);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(l10n.uploadSuccess(droppedNames.length))),
     );
   }
 
@@ -138,10 +287,10 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: _BottomNavBar(
         currentIndex: _currentIndex,
         onTap: (index) {
-          if (index == 2) {
+          if (index == 1) {
             _showAddSheet();
           } else {
-            setState(() => _currentIndex = index < 2 ? index : index - 1);
+            setState(() => _currentIndex = index < 1 ? index : index - 1);
           }
         },
         l10n: l10n,
@@ -150,11 +299,11 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-/// Кастомный нижний навбар: 5 позиций в одну линию.
-/// Позиция 2 — кнопка «+» (не вкладка, вызывает BottomSheet).
+/// Кастомный нижний навбар: 3 позиции в одну линию.
+/// Позиция 1 — кнопка «+».
 class _BottomNavBar extends StatelessWidget {
-  final int currentIndex; // 0..3 (индекс страницы, без учёта «+»)
-  final ValueChanged<int> onTap; // передаёт 0..4 (с учётом «+» в центре)
+  final int currentIndex;
+  final ValueChanged<int> onTap;
   final AppLocalizations l10n;
 
   const _BottomNavBar({
@@ -168,43 +317,27 @@ class _BottomNavBar extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final size = MediaQuery.sizeOf(context);
 
-    // Адаптивные размеры: иконки ~7% ширины экрана, шрифт ~3%, высота бара ~10%
     final iconSize = (size.width * 0.072).clamp(26.0, 36.0);
     final fontSize = (size.width * 0.031).clamp(11.0, 15.0);
     final barHeight = (size.height * 0.095).clamp(68.0, 88.0);
     final fabSize = (size.width * 0.135).clamp(50.0, 64.0);
     final fabRadius = fabSize * 0.3;
 
-    // Маппинг: визуальные индексы 0,1,_,3,4 → страницы 0,1,_,2,3
     final items = [
-      _NavItem(
-        icon: Icons.star_outline_rounded,
-        activeIcon: Icons.star_rounded,
-        label: l10n.favorites,
-        pageIndex: 0,
-        visualIndex: 0,
-      ),
-      _NavItem(
-        icon: Icons.photo_library_outlined,
-        activeIcon: Icons.photo_library_rounded,
-        label: l10n.gallery,
-        pageIndex: 1,
-        visualIndex: 1,
-      ),
-      null, // «+» кнопка
       _NavItem(
         icon: Icons.folder_outlined,
         activeIcon: Icons.folder_rounded,
-        label: l10n.collections,
-        pageIndex: 2,
-        visualIndex: 3,
+        label: l10n.filesTab,
+        pageIndex: 0,
+        visualIndex: 0,
       ),
+      null, // «+» кнопка
       _NavItem(
         icon: Icons.more_horiz_rounded,
         activeIcon: Icons.more_horiz_rounded,
         label: l10n.more,
-        pageIndex: 3,
-        visualIndex: 4,
+        pageIndex: 1,
+        visualIndex: 2,
       ),
     ];
 
@@ -224,11 +357,10 @@ class _BottomNavBar extends StatelessWidget {
             children: [
               for (int i = 0; i < items.length; i++)
                 if (items[i] == null)
-                  // Кнопка «+»
                   Expanded(
                     child: Center(
                       child: GestureDetector(
-                        onTap: () => onTap(2),
+                        onTap: () => onTap(1),
                         child: Container(
                           width: fabSize,
                           height: fabSize,
@@ -255,7 +387,6 @@ class _BottomNavBar extends StatelessWidget {
                     ),
                   )
                 else
-                  // Обычная вкладка
                   Expanded(
                     child: InkWell(
                       onTap: () => onTap(i),

@@ -19,6 +19,8 @@ import '../../data/models/login_request.dart';
 import '../../data/models/register_request.dart';
 import '../../../../core/providers/core_providers.dart';
 
+const bool useMockAuth = true;
+
 /// Провайдер для AuthRemoteDataSource.
 final authDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
   final apiClient = ref.watch(apiClientProvider);
@@ -61,11 +63,19 @@ class AuthError extends AuthState {
 /// Notifier для управления состоянием авторизации.
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthRepository _repository;
+  bool _mockLoggedIn = false;
 
   AuthNotifier(this._repository) : super(const AuthInitial());
 
   /// Проверяет, залогинен ли пользователь (есть ли сохранённые токены).
   Future<void> checkAuthStatus() async {
+    if (useMockAuth) {
+      state = _mockLoggedIn
+          ? const AuthAuthenticated()
+          : const AuthUnauthenticated();
+      return;
+    }
+
     final isAuth = await _repository.isAuthenticated();
     state = isAuth ? const AuthAuthenticated() : const AuthUnauthenticated();
   }
@@ -75,6 +85,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required String username,
     required String password,
   }) async {
+    if (useMockAuth) {
+      state = const AuthLoading();
+      await Future<void>.delayed(const Duration(milliseconds: 250));
+      _mockLoggedIn = true;
+      state = const AuthAuthenticated();
+      return true;
+    }
+
     state = const AuthLoading();
 
     final result = await _repository.login(
@@ -103,6 +121,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
     String? surName,
     required String phoneNumber,
   }) async {
+    if (useMockAuth) {
+      state = const AuthLoading();
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      _mockLoggedIn = true;
+      state = const AuthAuthenticated();
+      return true;
+    }
+
     state = const AuthLoading();
 
     final result = await _repository.register(
@@ -131,6 +157,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   /// Выход из аккаунта.
   Future<void> logout() async {
+    if (useMockAuth) {
+      _mockLoggedIn = false;
+      state = const AuthUnauthenticated();
+      return;
+    }
+
     await _repository.logout();
     state = const AuthUnauthenticated();
   }

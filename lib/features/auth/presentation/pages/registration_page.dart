@@ -16,8 +16,9 @@ import '../../../../core/utils/input_validators.dart';
 import '../widgets/auth_text_field.dart';
 import '../widgets/auth_button.dart';
 import '../providers/auth_provider.dart';
+import '../../../home/presentation/providers/corporate_cloud_stub_provider.dart';
 import 'login_page.dart';
-import '../../../home/presentation/pages/home_page.dart';
+import '../../../home/presentation/pages/import_by_link_page.dart';
 
 class RegistrationPage extends ConsumerStatefulWidget {
   const RegistrationPage({super.key});
@@ -99,8 +100,9 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         );
 
     if (success && mounted) {
+      ref.read(corporateCloudProvider.notifier).setAuthenticatedUsername(username);
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const HomePage()),
+        MaterialPageRoute(builder: (_) => const ImportByLinkPage()),
         (route) => false,
       );
     }

@@ -33,12 +33,20 @@ class AppLocalizations {
       'add': 'Добавить',
       'collections': 'Коллекции',
       'more': 'Ещё',
+      'filesTab': 'Файлы',
+      'adminPanel': 'Панель администратора',
 
       // Add sheet
       'addTitle': 'Добавить',
       'takePhoto': 'Сделать фото',
       'chooseFromGallery': 'Выбрать из галереи',
       'uploadFile': 'Загрузить файл',
+        'uploadDropTitle': 'Загрузка файла',
+        'uploadDropHint':
+          'Перетащите файл в эту область или выберите его через проводник',
+        'chooseFile': 'Выбрать файл',
+        'filesSelected': 'Выбрано файлов',
+        'uploadSuccess': 'Файлов загружено',
 
       // Pages
       'favoritesTitle': 'Любимое',
@@ -116,6 +124,8 @@ class AppLocalizations {
       'noChanges': 'Вы ничего не изменили',
       'wrongPassword': 'Неверный пароль',
       'updateError': 'Ошибка обновления профиля',
+      'error': 'Ошибка',
+      'errorLoadingFile': 'Ошибка загрузки файла',
       'logout': 'Выйти из аккаунта',
       'logoutConfirm': 'Вы уверены, что хотите выйти?',
     },
@@ -126,12 +136,20 @@ class AppLocalizations {
       'add': 'Add',
       'collections': 'Collections',
       'more': 'More',
+      'filesTab': 'Files',
+      'adminPanel': 'Admin panel',
 
       // Add sheet
       'addTitle': 'Add',
       'takePhoto': 'Take photo',
       'chooseFromGallery': 'Choose from gallery',
       'uploadFile': 'Upload file',
+        'uploadDropTitle': 'File upload',
+        'uploadDropHint':
+          'Drop files into this area or choose them in file explorer',
+        'chooseFile': 'Choose file',
+        'filesSelected': 'Files selected',
+        'uploadSuccess': 'Files uploaded',
 
       // Pages
       'favoritesTitle': 'Favorites',
@@ -209,6 +227,8 @@ class AppLocalizations {
       'noChanges': 'No changes were made',
       'wrongPassword': 'Wrong password',
       'updateError': 'Profile update error',
+      'error': 'Error',
+      'errorLoadingFile': 'File loading error',
       'logout': 'Log out',
       'logoutConfirm': 'Are you sure you want to log out?',
     },
@@ -226,12 +246,19 @@ class AppLocalizations {
   String get add => get('add');
   String get collections => get('collections');
   String get more => get('more');
+  String get filesTab => get('filesTab');
+  String get adminPanel => get('adminPanel');
 
   // Add sheet
   String get addTitle => get('addTitle');
   String get takePhoto => get('takePhoto');
   String get chooseFromGallery => get('chooseFromGallery');
   String get uploadFile => get('uploadFile');
+  String get uploadDropTitle => get('uploadDropTitle');
+  String get uploadDropHint => get('uploadDropHint');
+  String get chooseFile => get('chooseFile');
+  String get filesSelected => get('filesSelected');
+  String uploadSuccess(int count) => '$count ${get('uploadSuccess')}';
 
   // Pages
   String get favoritesTitle => get('favoritesTitle');
@@ -307,6 +334,8 @@ class AppLocalizations {
   String get noChanges => get('noChanges');
   String get wrongPassword => get('wrongPassword');
   String get updateError => get('updateError');
+  String get error => get('error');
+  String get errorLoadingFile => get('errorLoadingFile');
   String get logout => get('logout');
   String get logoutConfirm => get('logoutConfirm');
 }

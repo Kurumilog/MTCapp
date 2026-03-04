@@ -24,6 +24,8 @@ import 'core/l10n/locale_provider.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
 import 'features/auth/presentation/pages/welcome_page.dart';
 import 'features/home/presentation/pages/home_page.dart';
+import 'features/home/presentation/pages/import_by_link_page.dart';
+import 'features/home/presentation/providers/corporate_cloud_stub_provider.dart';
 
 final localeProvider = LocaleProvider();
 final themeProvider = ThemeProvider();
@@ -85,12 +87,17 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
+    final hasCorporateAccess = ref.watch(
+      corporateCloudProvider.select((state) => state.hasCorporateAccess),
+    );
 
     return switch (authState) {
       AuthInitial() => const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       ),
-      AuthAuthenticated() => const HomePage(),
+      AuthAuthenticated() => hasCorporateAccess
+          ? const HomePage()
+          : const ImportByLinkPage(),
       _ => const WelcomePage(),
     };
   }

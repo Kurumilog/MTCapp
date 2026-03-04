@@ -16,8 +16,9 @@ import '../../../../core/utils/input_validators.dart';
 import '../widgets/auth_text_field.dart';
 import '../widgets/auth_button.dart';
 import '../providers/auth_provider.dart';
+import '../../../home/presentation/providers/corporate_cloud_stub_provider.dart';
 import 'registration_page.dart';
-import '../../../home/presentation/pages/home_page.dart';
+import '../../../home/presentation/pages/import_by_link_page.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   /// Если true — после успешного входа делаем pop (вызов из MorePage).
@@ -66,11 +67,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         .login(username: username, password: password);
 
     if (success && mounted) {
+      ref.read(corporateCloudProvider.notifier).setAuthenticatedUsername(username);
       if (widget.popOnSuccess) {
         Navigator.pop(context);
       } else {
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const HomePage()),
+          MaterialPageRoute(builder: (_) => const ImportByLinkPage()),
           (route) => false,
         );
       }

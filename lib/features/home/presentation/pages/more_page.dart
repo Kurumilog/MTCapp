@@ -9,9 +9,10 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_localizations.dart';
-import '../../../auth/data/models/user_model.dart';
 import '../../../auth/presentation/pages/login_page.dart';
-import '../providers/user_provider.dart';
+import '../providers/corporate_cloud_stub_provider.dart';
+import 'admin_panel_page.dart';
+import 'import_by_link_page.dart';
 import 'settings_page.dart';
 
 class MorePage extends ConsumerWidget {
@@ -21,12 +22,12 @@ class MorePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final colorScheme = Theme.of(context).colorScheme;
-    final userAsync = ref.watch(userProvider);
+    final cloudState = ref.watch(corporateCloudProvider);
 
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       children: [
-        _buildProfileHeader(context, colorScheme, l10n, userAsync),
+        _buildProfileHeader(context, colorScheme, l10n, cloudState),
         const Divider(height: 32),
         _buildMenuItem(
           context: context,
@@ -41,27 +42,27 @@ class MorePage extends ConsumerWidget {
         const Divider(),
         _buildMenuItem(
           context: context,
-          icon: Icons.delete_outline_rounded,
-          label: l10n.trash,
-          colorScheme: colorScheme,
-          trailing: _comingSoonBadge(context, l10n),
-        ),
-        const Divider(),
-        _buildMenuItem(
-          context: context,
-          icon: Icons.download_outlined,
-          label: l10n.download,
-          colorScheme: colorScheme,
-          trailing: _comingSoonBadge(context, l10n),
-        ),
-        const Divider(),
-        _buildMenuItem(
-          context: context,
-          icon: Icons.cloud_download_outlined,
+          icon: Icons.link_rounded,
           label: l10n.cloudImport,
           colorScheme: colorScheme,
-          trailing: _comingSoonBadge(context, l10n),
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ImportByLinkPage()),
+          ),
         ),
+        if (cloudState.isAdmin) ...[
+          const Divider(),
+          _buildMenuItem(
+            context: context,
+            icon: Icons.admin_panel_settings_outlined,
+            label: l10n.adminPanel,
+            colorScheme: colorScheme,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AdminPanelPage()),
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -70,7 +71,7 @@ class MorePage extends ConsumerWidget {
     BuildContext context,
     ColorScheme colorScheme,
     AppLocalizations l10n,
-    AsyncValue<UserModel?> userAsync,
+    CorporateCloudState cloudState,
   ) {
     final textTheme = Theme.of(context).textTheme;
     return Padding(
@@ -99,14 +100,10 @@ class MorePage extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
-          userAsync.when(
-            loading: () => const CircularProgressIndicator(),
-            error: (_, e) =>
-                _buildLoginPrompt(context, l10n, colorScheme, textTheme),
-            data: (user) => user != null
-                ? _buildUserInfo(context, colorScheme, user)
-                : _buildLoginPrompt(context, l10n, colorScheme, textTheme),
-          ),
+          if (cloudState.username == null)
+            _buildLoginPrompt(context, l10n, colorScheme, textTheme)
+          else
+            _buildUserInfo(context, colorScheme, cloudState),
         ],
       ),
     );
@@ -115,59 +112,35 @@ class MorePage extends ConsumerWidget {
   Widget _buildUserInfo(
     BuildContext context,
     ColorScheme colorScheme,
-    UserModel user,
+    CorporateCloudState cloudState,
   ) {
     final textTheme = Theme.of(context).textTheme;
-    final nameParts = [user.lastName, user.firstName];
-    if (user.surName != null && user.surName!.isNotEmpty) {
-      nameParts.add(user.surName!);
-    }
-    final fullName = nameParts.join(' ');
+    final roleLabel = cloudState.isAdmin ? 'Manager/Admin' : 'Employee';
 
     return Column(
       children: [
         Text(
-          fullName,
+          cloudState.username!,
           style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 4),
         Text(
-          '@${user.username}',
+          roleLabel,
           style: textTheme.bodyMedium?.copyWith(color: colorScheme.primary),
         ),
-        if (user.phoneNumber != null && user.phoneNumber!.isNotEmpty) ...[
-          const SizedBox(height: 6),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.phone_outlined,
-                size: 14,
-                color: colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                user.phoneNumber!,
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-        ],
         const SizedBox(height: 6),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.email_outlined,
+              Icons.business_outlined,
               size: 14,
               color: colorScheme.onSurfaceVariant,
             ),
             const SizedBox(width: 4),
             Text(
-              user.email,
+              cloudState.organizationName,
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -219,23 +192,6 @@ class MorePage extends ConsumerWidget {
       trailing: trailing ?? const Icon(Icons.chevron_right_rounded),
       onTap: onTap,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-    );
-  }
-
-  Widget _comingSoonBadge(BuildContext context, AppLocalizations l10n) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        l10n.comingSoon,
-        style: Theme.of(
-          context,
-        ).textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
-      ),
     );
   }
 }
