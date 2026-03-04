@@ -321,14 +321,250 @@ MVP-функции:
 
 ---
 
-## 12) Что сделать отдельно на backend (короткий список)
+## 12) Что нужно от backend
 
-1. Endpoint импорта в организацию: `link + access key`.
-2. Модель прав на папки (назначает Manager/Admin).
-3. API списка файлов с разделением `Private`/корпоративные.
-4. API загрузки файлов и статусов (с интеграцией MinIO, когда будет готово).
-5. API админки: пользователи, права, статистика, заполненность.
-6. Единая модель ошибок для фронта (ключ невалиден, нет прав, сеть/сервер).
+Стек: **REST API** (JSON), хранилище файлов — **MinIO** (S3-совместимое).
+
+---
+
+### 12.1 Авторизация и пользователи — **уже реализовано**
+
+Полная JWT-авторизация в приложении подключена и работает. Ниже — зафиксированный контракт из swagger для справки.
+
+**Схема токенов:**
+- `access-token` — `Bearer JWT` в заголовке `Authorization`.
+- `refresh-token` — `HttpOnly cookie` с именем `refresh_token`.
+
+| Метод | Endpoint | Назначение |
+|-------|----------|------------|
+| `POST` | `/api/auth/register` | Регистрация. Возвращает access-token в заголовке, refresh-token в cookie |
+| `POST` | `/api/auth/login` | Вход. Аналогично |
+| `POST` | `/api/auth/refresh` | Обновить access-token (передаётся refresh cookie) |
+| `POST` | `/api/auth/change_password` | Смена пароля. Аннулирует все сессии |
+| `DELETE` | `/api/auth/logout` | Завершить текущую сессию |
+| `DELETE` | `/api/auth/logout_all` | Завершить все сессии пользователя |
+| `GET` | `/api/users` | Список пользователей |
+| `GET` | `/api/users/{id}` | Профиль пользователя по id |
+| `PATCH` | `/api/users/update_info` | Обновление профиля (email, имя, телефон) |
+| `POST` | `/api/users` | Создать пользователя (admin, protected) |
+
+**`CreateUserDto`** (register):
+```json
+{
+  "username": "johndoe123",      // обязательный, min 3
+  "password": "12345678",        // обязательный, min 8
+  "email": "john@example.com",   // обязательный
+  "firstName": "John",           // обязательный, min 2
+  "lastName": "Doe",             // обязательный
+  "surName": "Nikolayevich",     // nullable
+  "phoneNumber": "+123456789"    // обязательный
+}
+```
+
+**Модель `User`** (ответ):
+```json
+{
+  "id": 1,
+  "email": "john@example.com",
+  "username": "johndoe123",
+  "firstName": "John",
+  "lastName": "Doe",
+  "surName": "Nikolayevich",
+  "phoneNumber": "+123456789",
+  "created_at": "2026-03-01T10:44:26Z",
+  "roles": [{ "id": 1, "role": "USER" }]
+}
+```
+
+> **Примечание:** роль `USER` — стандартная. Для корпоративного администратора потребуется отдельная роль (см. 12.2).
+
+---
+
+### 12.2 Организация и импорт по ссылке — **требует реализации**
+
+Нужно добавить роль `CORPORATE_ADMIN` в таблицу `roles` (сейчас есть только `USER`) и реализовать два endpoint'а.
+
+| Метод | Endpoint | Назначение |
+|-------|----------|------------|
+| `POST` | `/api/org/join` | Подключить пользователя к организации по ссылке и ключу |
+| `GET`  | `/api/org/me` | Получить информацию о текущей организации пользователя |
+
+Тело `POST /api/org/join`:
+```json
+{
+  "link": "https://cloud.example.com/invite/abc123",
+  "accessKey": "XXXX-YYYY"
+}
+```
+
+Ответ при успехе (`200`):
+```json
+{
+  "organizationId": "org_001",
+  "organizationName": "МТС Технологии",
+  "role": "employee"
+}
+```
+
+Ошибки (коды):
+- `400` — невалидный формат ссылки или ключа.
+- `403` — ключ неверный или истёк.
+- `409` — пользователь уже привязан к другой организации.
+
+---
+
+### 12.3 Файлы и папки — **требует реализации**
+
+| Метод | Endpoint | Назначение |
+|-------|----------|------------|
+| `GET`  | `/api/files/folders` | Список всех папок организации + `private` папка пользователя |
+| `GET`  | `/api/files/folders/{folderId}` | Содержимое папки (файлы внутри) |
+| `POST` | `/api/files/folders` | Создать новую папку (только для `CORPORATE_ADMIN`) |
+| `DELETE` | `/api/files/folders/{folderId}` | Удалить папку (только для `CORPORATE_ADMIN`) |
+| `GET`  | `/api/files` | Список последних/поиск файлов |
+| `DELETE` | `/api/files/{fileId}` | Удалить файл |
+| `GET`  | `/api/files/{fileId}/download` | Получить presigned URL для скачивания из MinIO |
+
+Структура папки в ответе:
+```json
+{
+  "id": "folder_001",
+  "name": "Документы компании",
+  "isPrivate": false,
+  "ownerRole": "org",
+  "createdAt": "2026-01-15T10:00:00Z"
+}
+```
+
+Структура файла в ответе:
+```json
+{
+  "id": "file_001",
+  "folderId": "folder_001",
+  "name": "onboarding.pdf",
+  "sizeBytes": 204800,
+  "mimeType": "application/pdf",
+  "uploadedBy": "user_007",
+  "updatedAt": "2026-03-01T14:22:00Z"
+}
+```
+
+---
+
+### 12.4 Загрузка файлов (через MinIO) — **требует реализации**
+
+Рекомендуемый подход — **presigned upload URL**, чтобы клиент грузил напрямую в MinIO без проксирования через бекенд.
+
+Шаг 1 — запросить presigned URL:
+
+| Метод | Endpoint | Назначение |
+|-------|----------|------------|
+| `POST` | `/api/files/upload-url` | Получить presigned PUT URL для MinIO |
+
+Тело запроса:
+```json
+{
+  "folderId": "folder_001",
+  "fileName": "report_q1.xlsx",
+  "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "sizeBytes": 512000
+}
+```
+
+Ответ:
+```json
+{
+  "uploadUrl": "https://minio.example.com/bucket/org_001/folder_001/report_q1.xlsx?X-Amz-Signature=...",
+  "fileId": "file_pending_xyz",
+  "expiresInSeconds": 300
+}
+```
+
+Шаг 2 — клиент делает `PUT` напрямую на `uploadUrl`.
+
+Шаг 3 — подтвердить загрузку:
+
+| Метод | Endpoint | Назначение |
+|-------|----------|------------|
+| `POST` | `/api/files/{fileId}/confirm` | Сообщить бекенду, что файл загружен в MinIO |
+
+Ответ — полный объект файла (как в 12.3).
+
+MinIO конфигурация (на стороне backend):
+- Бакет: `corporate-cloud` (или per-org бакеты: `org-{orgId}`).
+- Путь объекта: `{orgId}/{folderId}/{fileId}/{fileName}`.
+- Lifecycle policy: опционально, для автоочистки незавершённых загрузок.
+
+---
+
+### 12.5 Права доступа на папки (ACL) — **требует реализации**
+
+| Метод | Endpoint | Назначение |
+|-------|----------|------------|
+| `GET`  | `/api/admin/folders/{folderId}/acl` | Получить список прав на папку |
+| `PUT`  | `/api/admin/folders/{folderId}/acl` | Установить права пользователей на папку |
+
+Уровни доступа:
+- `read` — только просмотр и скачивание.
+- `write` — чтение + загрузка файлов.
+- `manage` — полный доступ (включая удаление, переименование).
+
+Тело `PUT`:
+```json
+{
+  "permissions": [
+    { "userId": "user_002", "level": "write" },
+    { "userId": "user_003", "level": "read" }
+  ]
+}
+```
+
+---
+
+### 12.6 Администраторский раздел — **требует реализации**
+
+| Метод | Endpoint | Назначение |
+|-------|----------|------------|
+| `GET`  | `/api/admin/members` | Список участников организации с ролями |
+| `PUT`  | `/api/admin/members/{userId}/role` | Изменить роль участника |
+| `DELETE` | `/api/admin/members/{userId}` | Удалить участника из организации |
+| `GET`  | `/api/admin/stats` | Статистика: файлы, папки, использование хранилища |
+
+Ответ `/admin/stats`:
+```json
+{
+  "storageUsedBytes": 133816745,
+  "storageTotalBytes": 536870912000,
+  "fileCount": 47,
+  "folderCount": 8,
+  "memberCount": 12
+}
+```
+
+---
+
+### 12.7 Единая модель ошибок
+
+Все ошибки возвращаются в виде:
+```json
+{
+  "code": "INVALID_ACCESS_KEY",
+  "message": "Ключ доступа неверный или истёк",
+  "details": null
+}
+```
+
+Коды ошибок, которые Flutter-клиент обязан обрабатывать:
+
+| Код | HTTP | Описание |
+|-----|------|----------|
+| `INVALID_ACCESS_KEY` | 403 | Ключ доступа неверный или истёк |
+| `ALREADY_IN_ORG` | 409 | Пользователь уже в другой организации |
+| `FORBIDDEN` | 403 | Недостаточно прав для операции |
+| `FILE_NOT_FOUND` | 404 | Файл или папка не найдены |
+| `STORAGE_QUOTA_EXCEEDED` | 507 | Превышена квота хранилища |
+| `UPLOAD_EXPIRED` | 410 | Presigned URL истёк, нужно запросить новый |
+| `INVALID_TOKEN` | 401 | Токен недействителен, требуется повторный вход |
 
 ---
 

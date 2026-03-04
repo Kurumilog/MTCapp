@@ -1,3 +1,12 @@
+/// 1) Общее назначение:
+///    Экран подключения к корпоративному облаку по ссылке и ключу доступа.
+///    Является обязательным шлюзом после авторизации до перехода на HomePage.
+/// 2) С какими файлами связан:
+///    - corporate_cloud_stub_provider.dart (вызов connectByLink(), чтение hasCorporateAccess).
+///    - home_page.dart (переход после успешного подключения).
+///    - Инициируется из main.dart (AuthGate) и more_page.dart.
+/// 3) Описание функций:
+///    - _submit(): валидирует поля, вызывает connectByLink(), переходит на HomePage или показывает SnackBar с ошибкой.
 library;
 
 import 'package:flutter/material.dart';

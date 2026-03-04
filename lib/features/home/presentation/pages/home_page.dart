@@ -2,7 +2,7 @@
 ///    Главный контейнер приложения после авторизации (Material 3).
 ///    Управляет NavigationBar и переключением между основными разделами.
 /// 2) С какими файлами связан:
-///    - favorites_page, gallery_page, collections_page, more_page
+///    - files_page, more_page
 /// 3) Описание функций:
 ///    - _onDestinationSelected(): переключение вкладок.
 ///    - _showAddSheet(): BottomSheet добавления файлов (камера / галерея / файлы).

@@ -1,3 +1,16 @@
+/// 1) Общее назначение:
+///    Stub-провайдер корпоративного облака (Phase A, без бекенда).
+///    Хранит всё состояние: папки, файлы, участники, прогресс загрузки, информация об организации.
+/// 2) С какими файлами связан:
+///    - files_page.dart, admin_panel_page.dart, import_by_link_page.dart (чтение state).
+///    - login_page.dart, registration_page.dart (вызов setAuthenticatedUsername).
+///    - home_page.dart (вызов uploadFiles).
+///    - main.dart (чтение hasCorporateAccess для роутинга).
+/// 3) Описание функций:
+///    - connectByLink(): валидирует ссылку/ключ, устанавливает hasCorporateAccess = true.
+///    - uploadFiles(): имитирует прогресс загрузки, добавляет файлы в папку Private.
+///    - setAuthenticatedUsername(): определяет роль пользователя по имени (admin/manager → isAdmin).
+///    - logoutCleanup(): сбрасывает state до начального при выходе из аккаунта.
 library;
 
 import 'dart:async';

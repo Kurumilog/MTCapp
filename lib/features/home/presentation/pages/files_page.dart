@@ -1,3 +1,12 @@
+/// 1) Общее назначение:
+///    Главный экран файлов корпоративного облака (вкладка «Файлы»).
+///    Отображает дерево папок с вложенными файлами через ExpansionTile.
+/// 2) С какими файлами связан:
+///    - corporate_cloud_stub_provider.dart (CorporateCloudState: folders, files).
+///    - Встраивается в home_page.dart как первая вкладка.
+/// 3) Описание функций:
+///    - build(): список папок (ExpansionTile), файлы внутри папок с датой изменения.
+///    - _formatDate(): форматирует DateTime в «ДД.ММ.ГГГГ ЧЧ:ММ».
 library;
 
 import 'package:flutter/material.dart';
