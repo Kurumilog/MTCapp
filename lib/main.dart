@@ -37,8 +37,8 @@ final localeProvider = LocaleProvider();
 final themeProvider = ThemeProvider();
 
 // Размер popup-окна на Windows
-const _kPopupWidth = 420.0;
-const _kPopupHeight = 700.0;
+const _kPopupWidth = 360.0;
+const _kPopupHeight = 600.0;
 
 bool get _isWindows =>
     !kIsWeb && defaultTargetPlatform == TargetPlatform.windows;
@@ -68,6 +68,8 @@ Future<void> _initWindowsPopup() async {
   await windowManager.waitUntilReadyToShow(windowOptions, () async {
     // Запрет реального закрытия — вместо него будем скрывать в трей
     await windowManager.setPreventClose(true);
+    // Окно нельзя перетаскивать — фиксированная позиция у трея
+    await windowManager.setMovable(false);
     await _positionNearTray();
     await windowManager.show();
     await windowManager.focus();

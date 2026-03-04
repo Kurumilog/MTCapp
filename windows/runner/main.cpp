@@ -1,3 +1,7 @@
+// This file is Windows-only and is not compiled on other platforms.
+// IDE warnings about missing headers on Linux/macOS can be safely ignored.
+#ifdef _WIN32
+
 #include <flutter/dart_project.h>
 #include <flutter/flutter_view_controller.h>
 #include <windows.h>
@@ -26,7 +30,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
 
   FlutterWindow window(project);
   Win32Window::Point origin(10, 10);
-  Win32Window::Size size(420, 700);  // popup size — managed by window_manager at runtime
+  Win32Window::Size size(360, 600);  // popup size — managed by window_manager at runtime
   if (!window.Create(L"MTC Cloud", origin, size)) {
     return EXIT_FAILURE;
   }
@@ -41,3 +45,5 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   ::CoUninitialize();
   return EXIT_SUCCESS;
 }
+
+#endif  // _WIN32
